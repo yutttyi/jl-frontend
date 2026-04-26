@@ -1054,11 +1054,20 @@ const api = {
 let backendAvailable = false;
 async function checkBackend() {
   try {
+    // 尝试带 /api 前缀的路径
     await fetch(API_BASE + '/health', { signal: AbortSignal.timeout(5000) });
     backendAvailable = true;
+    console.log('[API] 后端连接成功');
   } catch(e) {
-    backendAvailable = false;
-    console.warn('[API] 后端不可用，使用本地数据模式');
+    // 如果失败，尝试不带 /api 前缀的路径
+    try {
+      await fetch(API_BASE.replace('/api', '') + '/api/health', { signal: AbortSignal.timeout(5000) });
+      backendAvailable = true;
+      console.log('[API] 后端连接成功（备用路径）');
+    } catch(e2) {
+      backendAvailable = false;
+      console.warn('[API] 后端不可用，使用本地数据模式');
+    }
   }
 }
 
