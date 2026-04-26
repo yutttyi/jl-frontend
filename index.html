@@ -1521,7 +1521,6 @@ async function syncDataFromBackend(showToastMsg = true) {
     }
   } finally {
     _syncStatus.syncing = false;
-    updateSyncStatusUI();
   }
 }
 
@@ -4345,11 +4344,14 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   document.getElementById('confirmPassword')?.addEventListener('keypress',e=>{if(e.key==='Enter')savePassword();});
   document.getElementById('regPassword2')?.addEventListener('keypress',e=>{if(e.key==='Enter')doRegister();});
   
-  // 默认使用后端模式，失败时降级到本地
+  // 默认使用后端模式
   backendAvailable = true;
   
-  // 尝试用已保存的 token 恢复登录状态
-  if (_authToken && !currentUser) {
+  // 先检查后端是否可用
+  await checkBackend();
+  
+  // 尝试用已保存的 token 恢复登录状态（仅后端可用时）
+  if (_authToken && !currentUser && backendAvailable) {
     try {
       const meRes = await api.get('/auth/me');
       if (meRes.success) {
@@ -4358,8 +4360,10 @@ document.addEventListener('DOMContentLoaded', async ()=>{
         updateNavUser();
       }
     } catch(e) {
+      // Token 过期或无效，清除
       _authToken = null;
       localStorage.removeItem('authToken');
+      console.log('[Init] 已清除过期 Token');
     }
   }
   
