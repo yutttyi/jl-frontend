@@ -1408,7 +1408,7 @@ async function syncDataFromBackend(showToastMsg = true) {
   _syncStatus.syncing = true;
   
   try {
-    console.log('[syncDataFromBackend] 开始同步...');
+    console.log('[syncDataFromBackend] 开始同步... currentUser:', !!currentUser, 'token:', !!_authToken);
     
     // 分别请求每个数据源，避免一个失败影响全部
     let awardsData = null, noticesData = null, bannersData = null;
@@ -1416,6 +1416,7 @@ async function syncDataFromBackend(showToastMsg = true) {
     // 同步奖项
     try {
       const awardsRes = await api.get('/awards');
+      console.log('[syncDataFromBackend] /awards 响应:', JSON.stringify(awardsRes).substring(0, 200));
       if (awardsRes.success && awardsRes.data) {
         awards = awardsRes.data.map(a => ({
           id: String(a.id),
@@ -1457,6 +1458,7 @@ async function syncDataFromBackend(showToastMsg = true) {
     // 同步横幅
     try {
       const bannersRes = await api.get('/banners');
+      console.log('[syncDataFromBackend] /banners 响应:', JSON.stringify(bannersRes).substring(0, 300));
       if (bannersRes.success && bannersRes.data) {
         bannerList = bannersRes.data.map(b => ({
           id: b.id,
@@ -1468,6 +1470,9 @@ async function syncDataFromBackend(showToastMsg = true) {
         }));
         localStorage.setItem('bannerList', JSON.stringify(bannerList));
         bannersData = bannerList.length;
+        console.log('[syncDataFromBackend] 横幅已更新:', bannerList.length, '条', JSON.stringify(bannerList));
+      } else {
+        console.warn('[syncDataFromBackend] 横幅响应无数据:', bannersRes);
       }
     } catch(e) {
       console.warn('[syncDataFromBackend] 横幅同步失败:', e.message);
@@ -1506,13 +1511,16 @@ async function syncDataFromBackend(showToastMsg = true) {
     const syncedItems = [];
     if (awardsData !== null) syncedItems.push('奖项' + awardsData + '条');
     if (noticesData !== null) syncedItems.push('公告' + noticesData + '条');
-    if (bannersData !== null) syncedItems.push('横幅' + bannersData.length + '条');
+    if (bannerList.length > 0) syncedItems.push('横幅' + bannerList.length + '条');
     
     // 同步成功后立即刷新界面
-    renderAwards();
-    renderHomeBanner();
-    renderHomeStats();
-    renderHomeMyRecords();
+    console.log('[syncDataFromBackend] 刷新界面... awards:', awards.length, 'banners:', bannerList.length, 'noticeList:', noticeList.length);
+    try { renderAwards(); } catch(e) { console.error('[sync] renderAwards 失败:', e); }
+    try { renderHomeBanner(); } catch(e) { console.error('[sync] renderHomeBanner 失败:', e); }
+    try { renderHomeStats(); } catch(e) { console.error('[sync] renderHomeStats 失败:', e); }
+    try { renderHomeMyRecords(); } catch(e) { console.error('[sync] renderHomeMyRecords 失败:', e); }
+    try { renderHomeNews(); } catch(e) { console.error('[sync] renderHomeNews 失败:', e); }
+    try { renderNews(); } catch(e) { console.error('[sync] renderNews 失败:', e); }
     
     console.log('[syncDataFromBackend] 同步完成，已刷新界面:', syncedItems.join('、'));
   } catch(e) {
@@ -3788,7 +3796,7 @@ function editBanner(id) {
   showModal('bannerEditModal');
 }
 
-function saveBanner() {
+async function saveBanner() {
   const tag = document.getElementById('bannerTag').value.trim();
   const title = document.getElementById('bannerEditTitle2').value.trim();
   const desc = document.getElementById('bannerEditDesc').value.trim();
@@ -3800,6 +3808,23 @@ function saveBanner() {
     return;
   }
   
+  // 尝试同步到后端（如果已登录）
+  if (_authToken && backendAvailable) {
+    try {
+      if (editingBannerId && String(editingBannerId) !== String(Date.now())) {
+        // 更新已有横幅
+        await api.put('/banners/' + editingBannerId, { tag, title, description: desc, link: linkType, status: active ? 'active' : 'inactive' });
+      } else {
+        // 新建横幅
+        await api.post('/banners', { tag, title, description: desc, link: linkType, status: active ? 'active' : 'inactive' });
+      }
+      console.log('[saveBanner] 已同步到后端');
+    } catch(e) {
+      console.warn('[saveBanner] 后端同步失败，仅保存到本地:', e.message);
+    }
+  }
+  
+  // 本地也更新
   if (editingBannerId) {
     const idx = bannerList.findIndex(x => x.id === editingBannerId);
     if (idx !== -1) {
@@ -3816,8 +3841,19 @@ function saveBanner() {
   showToast('✅ 横幅已保存');
 }
 
-function deleteBanner(id) {
+async function deleteBanner(id) {
   if (!confirm('确定删除此横幅？')) return;
+  
+  // 同步到后端
+  if (_authToken && backendAvailable) {
+    try {
+      await api.del('/banners/' + id);
+      console.log('[deleteBanner] 已从后端删除');
+    } catch(e) {
+      console.warn('[deleteBanner] 后端删除失败:', e.message);
+    }
+  }
+  
   bannerList = bannerList.filter(x => x.id !== id);
   safeSave('bannerList', bannerList);
   renderAdminBanners();
