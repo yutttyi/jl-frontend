@@ -1,0 +1,4235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>激励奖项平台</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      /* 小清新主色调 - 雾霾蓝，更明亮通透 */
+      --primary: #6B8E9F;
+      --primary-dark: #5A7D8E;
+      --primary-light: #8CAAB9;
+      --primary-bg: #EDF3F5;
+      
+      /* 次色 */
+      --secondary: #6B8E9F;
+      --secondary-light: #4D7A8C;
+      
+      /* 强调色 - 淡金铜 */
+      --accent: #D4A574;
+      --accent-dark: #B88B5A;
+      
+      /* 背景色 - 微冷白，像清晨的空气 */
+      --bg-main: #F7F9FA;
+      --bg-card: #FFFFFF;
+      --bg-hover: #F0F4F5;
+      
+      /* 文字色 */
+      --text-primary: #2D3436;
+      --text-secondary: #8A9BA8;
+      --text-muted: #B8C5CE;
+      
+      /* 功能色 - 清新莫兰迪 */
+      --success: #90C8A8;
+      --warning: #E8C87A;
+      --danger: #C07D6F;
+      
+      /* 点缀色 - 小清新的秘密 */
+      --mint: #A8D5BA;
+      --cream: #E8D5B7;
+      --dusty-pink: #D4A5A5;
+      --lavender: #B8B8D1;
+      --peach: #E8C4A0;
+      
+      /* 层次阴影 - 更柔和 */
+      --shadow-sm: 0 1px 3px rgba(107, 142, 159, 0.05), 0 2px 8px rgba(107, 142, 159, 0.06);
+      --shadow-md: 0 4px 12px rgba(107, 142, 159, 0.06), 0 8px 24px rgba(107, 142, 159, 0.08);
+      --shadow-lg: 0 8px 24px rgba(107, 142, 159, 0.08), 0 16px 48px rgba(107, 142, 159, 0.10);
+      --shadow-hover: 0 12px 32px rgba(107, 142, 159, 0.10), 0 24px 60px rgba(107, 142, 159, 0.12);
+      
+      /* 圆角 - 更圆润有机 */
+      --radius-sm: 10px;
+      --radius-md: 14px;
+      --radius-lg: 22px;
+      --radius-xl: 28px;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #F7F9FA;
+      color: var(--text-primary);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background-image: 
+        radial-gradient(circle at 15% 30%, rgba(168,213,186,0.04) 0%, transparent 45%),
+        radial-gradient(circle at 85% 20%, rgba(232,213,183,0.04) 0%, transparent 45%),
+        radial-gradient(circle at 50% 80%, rgba(180,184,209,0.03) 0%, transparent 40%);
+    }
+    
+    h1, h2, h3, h4, .nav-logo span, .banner-title, .award-name, .section-title, .sidebar-title {
+      font-family: 'Noto Serif SC', 'Inter', serif;
+      letter-spacing: -0.02em;
+    }
+    html, body { width: 100%; min-height: 100vh; background: #F7F9FA; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    a { text-decoration: none; color: inherit; }
+    input[type="file"] { display: none; }
+
+    .container { width: 100%; min-height: calc(100vh - 72px - 52px); display: none; padding: 40px 64px; }
+    .container.active { display: block; }
+
+    /* 导航栏 - 毛玻璃 + 清新细线 */
+    .nav-bar { width: 100%; height: 72px; background: rgba(255,255,255,0.88); backdrop-filter: blur(24px) saturate(1.2); border-bottom: 1px solid rgba(107,142,159,0.12); display: flex; align-items: center; justify-content: space-between; padding: 0 80px; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 3px rgba(107,142,159,0.04), 0 4px 12px rgba(107,142,159,0.02); }
+    .nav-logo { display: flex; align-items: center; gap: 10px; }
+    .nav-logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #6B8E9F 0%, #8CAAB9 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; font-weight: 700; box-shadow: 0 4px 12px rgba(107,142,159,0.25); }
+    .nav-logo span { font-size: 22px; font-weight: 700; color: #2D3436; letter-spacing: -0.5px; font-family: 'Noto Serif SC', serif; }
+    .nav-tabs { display: flex; gap: 8px; }
+    .nav-tab { height: 40px; padding: 0 20px; border-radius: 20px; display: flex; align-items: center; cursor: pointer; font-size: 14px; color: #8A9BA8; transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); font-weight: 500; }
+    .nav-tab:hover { background: rgba(107,142,159,0.08); color: #6B8E9F; transform: translateY(-1px); }
+    .nav-tab.active { background: linear-gradient(135deg, #6B8E9F 0%, #7DA3B3 100%); color: #fff; font-weight: 500; box-shadow: 0 2px 10px rgba(107,142,159,0.3); }
+    .nav-user { display: flex; align-items: center; gap: 12px; }
+    .nav-login-btn { height: 40px; padding: 0 20px; border-radius: 20px; background: linear-gradient(135deg, #6B8E9F 0%, #7DA3B3 100%); display: flex; align-items: center; gap: 6px; cursor: pointer; color: #fff; font-size: 13px; font-weight: 500; box-shadow: 0 2px 10px rgba(107,142,159,0.3); transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+    .nav-login-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(107,142,159,0.35); }
+    .user-info { display: flex; align-items: center; gap: 10px; padding: 8px 16px 8px 8px; background: rgba(107,142,159,0.06); border-radius: 24px; border: 1.5px solid rgba(107,142,159,0.15); }
+    .user-info .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #A8D5BA 0%, #90C8A8 100%); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; box-shadow: 0 2px 8px rgba(168,213,186,0.3); }
+    .user-info .name { font-size: 14px; color: var(--text-primary); font-weight: 600; }
+    .user-info .role { font-size: 11px; color: #6B8E9F; font-weight: 500; }
+    .logout-btn { padding: 8px 16px; border-radius: 16px; background: var(--bg-card); border: 1.5px solid rgba(107,142,159,0.2); cursor: pointer; font-size: 12px; color: #8A9BA8; font-weight: 500; transition: all 0.25s; }
+    .logout-btn:hover { background: rgba(107,142,159,0.06); color: #6B8E9F; border-color: rgba(107,142,159,0.35); }
+
+    /* 管理员左右布局 */
+    .admin-layout { display: flex; min-height: calc(100vh - 72px - 52px); }
+    .admin-sidebar { width: 260px; background: var(--bg-card); border-right: 1px solid #E8E4DE; padding: 24px 0; flex-shrink: 0; }
+    .admin-sidebar-title { padding: 0 24px 20px; font-size: 18px; font-weight: 600; color: #2D3436; border-bottom: 1px solid #E8E4DE; margin-bottom: 16px; font-family: 'Noto Serif SC', serif; }
+    .admin-menu-item { padding: 14px 24px; display: flex; align-items: center; gap: 12px; cursor: pointer; font-size: 14px; color: #89949E; transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94); font-weight: 500; border-left: 3px solid transparent; }
+    .admin-menu-item:hover { background: #F5F4F2; color: #5C6B73; transform: translateX(4px); }
+    .admin-menu-item.active { background: linear-gradient(90deg, #F0F2F3 0%, transparent 100%); color: #5C6B73; font-weight: 600; border-left-color: #5C6B73; }
+    .admin-menu-icon { width: 24px; text-align: center; font-size: 16px; }
+    .admin-main { flex: 1; padding: 32px; overflow-y: auto; }
+    .admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+    .admin-header-title { font-size: 24px; font-weight: 600; color: #2D3436; font-family: 'Noto Serif SC', serif; letter-spacing: -0.02em; }
+    .admin-header-right { display: flex; align-items: center; gap: 12px; }
+
+    /* 布局 - 左侧边栏 + 右侧主内容 */
+    .home-layout { display: flex; gap: 32px; align-items: flex-start; }
+    .home-left-sidebar { width: 280px; flex-shrink: 0; position: sticky; top: 80px; }
+    .home-right-content { flex: 1; min-width: 0; }
+    .home-banner-wrapper { width: 100%; }
+    .home-banner-wrapper .banner { margin-bottom: 0; }
+    .sidebar-title { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; font-size: 17px; font-weight: 600; color: #2D3436; font-family: 'Noto Serif SC', serif; letter-spacing: -0.01em; }
+    .sidebar-title::before { content: ''; width: 4px; height: 22px; background: linear-gradient(180deg, #A8D5BA, #6B8E9F); border-radius: 2px; }
+    .icon-clock { width: 16px; height: 16px; }
+
+    .timeline-item { padding: 18px 20px; border-radius: var(--radius-lg); margin-bottom: 12px; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); box-shadow: 0 1px 3px rgba(107,142,159,0.04), 0 2px 8px rgba(107,142,159,0.05); border: 1px solid transparent; background: #fff; }
+    .timeline-item:hover { transform: translateX(6px); box-shadow: 0 4px 12px rgba(107,142,159,0.07), 0 8px 24px rgba(107,142,159,0.09); border-color: rgba(107,142,159,0.12); }
+    .timeline-item.active { background: linear-gradient(135deg, #F9FBFC 0%, #F3F8F5 100%); border: 1.5px solid rgba(168,213,186,0.4); }
+    .timeline-item.urgent { background: linear-gradient(135deg, #FDF9F8 0%, #F5EBE7 100%); border: 1.5px solid rgba(192,125,111,0.35); animation: urgentPulse 2s infinite; }
+    .timeline-item.inactive { background: linear-gradient(135deg, #F7F9FA 0%, #F0F2F3 100%); border: 1px solid rgba(176,190,197,0.2); }
+    .timeline-header { display: flex; align-items: center; justify-content: space-between; }
+    .timeline-header-left { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: #2D3436; font-family: 'Noto Serif SC', serif; }
+    .timeline-dot { width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 0 6px currentColor; }
+    .timeline-dot.yellow { background: #E8C87A; box-shadow: 0 0 8px rgba(232,200,122,0.5); }
+    .timeline-dot.red { background: #C07D6F; box-shadow: 0 0 8px rgba(192,125,111,0.5); }
+    .timeline-dot.gray { background: #B0BEC5; }
+    .timeline-desc { font-size: 13px; color: #8A9BA8; margin-top: 8px; line-height: 1.6; font-weight: 400; }
+    @keyframes urgentPulse { 0%, 100% { box-shadow: 0 1px 4px rgba(192,125,111,0.15); } 50% { box-shadow: 0 4px 14px rgba(192,125,111,0.25); } }
+
+    /* Banner - 紧凑版，适配右侧主内容区 */
+    .banner { background: linear-gradient(135deg, #FFFFFF 0%, #FAFCFD 35%, #F5F9FA 70%, #F0F5F7 100%); border-radius: var(--radius-xl); padding: 28px 36px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 0; box-shadow: 0 2px 8px rgba(107,142,159,0.04), 0 8px 24px rgba(107,142,159,0.06); position: relative; overflow: hidden; border: 1px solid rgba(107,142,159,0.08); gap: 24px; }
+    .banner:hover { box-shadow: 0 4px 16px rgba(107,142,159,0.06), 0 16px 40px rgba(107,142,159,0.1); transform: translateY(-2px); }
+    /* 顶部彩色渐变条 */
+    .banner::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #A8D5BA 0%, #E8D5B7 35%, #D4A5A5 70%, #B8B8D1 100%); border-radius: 0 0 3px 3px; opacity: 0.8; }
+    .banner-content { color: #2D3436; position: relative; z-index: 1; flex: 1; min-width: 0; }
+    .banner-illustration { flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .banner-tag { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; height: 26px; background: rgba(168,213,186,0.18); backdrop-filter: blur(8px); border-radius: 13px; font-size: 11px; margin-bottom: 10px; line-height: 18px; font-weight: 600; border: 1px solid rgba(168,213,186,0.3); color: #4A7A5E; letter-spacing: 0.04em; }
+    .banner-tag::before { content: '●'; font-size: 7px; color: #90C8A8; }
+    .banner-title { font-size: 22px; margin-bottom: 8px; font-weight: 600; letter-spacing: -0.02em; font-family: 'Noto Serif SC', serif; color: #2D3436; }
+    .banner-desc { font-size: 13px; color: #8A9BA8; font-weight: 400; line-height: 1.6; max-width: 420px; }
+    .banner-btn { height: 40px; padding: 0 22px; background: linear-gradient(135deg, #6B8E9F 0%, #8CAAB9 100%); border-radius: var(--radius-md); display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; color: #fff; font-weight: 600; position: relative; z-index: 1; box-shadow: 0 3px 12px rgba(107,142,159,0.3); transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); letter-spacing: 0.02em; flex-shrink: 0; white-space: nowrap; }
+    .banner-btn:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 6px 20px rgba(107,142,159,0.4); background: linear-gradient(135deg, #5A7D8E 0%, #7DA3B3 100%); }
+
+    /* 迷你申报概览 - 左侧边栏专用 */
+    .mini-stats { background: linear-gradient(135deg, #FFFFFF 0%, #FAFCFD 100%); border-radius: var(--radius-lg); border: 1px solid rgba(107,142,159,0.1); box-shadow: 0 1px 3px rgba(107,142,159,0.04), 0 4px 12px rgba(107,142,159,0.05); overflow: hidden; }
+    .mini-stats-header { display: flex; align-items: center; gap: 10px; padding: 0 0 16px 0; font-size: 17px; font-weight: 600; color: #2D3436; font-family: 'Noto Serif SC', serif; letter-spacing: -0.01em; }
+    .mini-stats-body { padding: 14px 16px; }
+    .mini-stats-row { display: flex; gap: 8px; justify-content: space-between; }
+    .mini-stat { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; padding: 8px 4px; background: #fff; border-radius: var(--radius-md); border: 1px solid rgba(107,142,159,0.08); transition: all 0.25s; min-width: 0; }
+    .mini-stat:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(107,142,159,0.07); border-color: rgba(107,142,159,0.15); }
+    .mini-stat-num { font-size: 20px; font-weight: 700; font-family: 'DM Mono', monospace; line-height: 1; }
+    .mini-stat.pending .mini-stat-num { color: #E8C87A; }
+    .mini-stat.approved .mini-stat-num { color: #90C8A8; }
+    .mini-stat.rejected .mini-stat-num { color: #C07D6F; }
+    .mini-stat.total .mini-stat-num { color: #6B8E9F; }
+    .mini-stat-label { font-size: 10px; color: #8A9BA8; font-weight: 500; white-space: nowrap; }
+
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .section-title { font-size: 19px; font-weight: 600; color: #2D3436; font-family: 'Noto Serif SC', serif; letter-spacing: -0.01em; }
+    .section-more { display: flex; align-items: center; gap: 4px; padding: 6px 14px; border: 1.5px solid rgba(107,142,159,0.18); border-radius: 16px; cursor: pointer; font-size: 12px; color: #8A9BA8; transition: all 0.25s; background: rgba(107,142,159,0.03); }
+    .section-more:hover { border-color: rgba(107,142,159,0.35); color: #6B8E9F; background: rgba(107,142,159,0.07); transform: translateY(-1px); }
+
+    .awards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .award-card { background: linear-gradient(180deg, #FFFFFF 0%, #FAFCFD 100%); border-radius: var(--radius-xl); padding: 28px; border: 1px solid rgba(107,142,159,0.1); transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94); cursor: pointer; min-height: 280px; height: 280px; display: flex; flex-direction: column; box-sizing: border-box; overflow: hidden; box-shadow: 0 2px 6px rgba(107,142,159,0.04), 0 6px 16px rgba(107,142,159,0.05), 0 14px 32px rgba(107,142,159,0.06); position: relative; }
+    .award-card::before { content: ''; position: absolute; top: 0; left: 24px; right: 24px; height: 2px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent); }
+    .award-card::after { content: ''; position: absolute; bottom: 0; left: 32px; right: 32px; height: 3px; background: linear-gradient(90deg, var(--card-accent, #A8D5BA), var(--card-accent2, #B8B8D1)); opacity: 0.5; border-radius: 2px; transition: all 0.35s; }
+    .award-card:hover { box-shadow: 0 4px 12px rgba(107,142,159,0.06), 0 12px 28px rgba(107,142,159,0.08), 0 28px 56px rgba(107,142,159,0.10); transform: translateY(-8px); border-color: rgba(107,142,159,0.18); }
+    .award-card:hover::after { opacity: 0.85; left: 20px; right: 20px; height: 4px; }
+    .award-card .award-name { flex-shrink: 0; font-weight: 500; }
+    .award-card .award-desc { flex: 1; min-height: 40px; max-height: 60px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .award-card > *:last-child { margin-top: auto; }
+    .award-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .award-icon { width: 46px; height: 46px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; transition: all 0.3s; }
+    .award-icon.star { background: linear-gradient(135deg, #FDF6E3 0%, #F5EBD0 100%); }
+    .award-icon.trophy { background: linear-gradient(135deg, #E8F5EE 0%, #D4EDDA 100%); }
+    .award-icon.shield { background: linear-gradient(135deg, #E8EAF5 0%, #D8DAE8 100%); }
+    .award-icon.leaf { background: linear-gradient(135deg, #E8F5EE 0%, #D4EDDA 100%); }
+    .award-icon.book { background: linear-gradient(135deg, #F5E8E8 0%, #EDD8D8 100%); }
+    .award-card:hover .award-icon { transform: scale(1.08) rotate(-3deg); }
+    /* 状态标签 - 清新莫兰迪 */
+    .award-status { height: 28px; padding: 0 14px; border-radius: 14px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 8px; border: 1.5px solid transparent; letter-spacing: 0.02em; }
+    .award-status .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .award-status.urgent { background: rgba(192,125,111,0.12); color: #A06858; border-color: rgba(192,125,111,0.25); }
+    .award-status.urgent .dot { background: #C07D6F; animation: pulse-dot 1.5s infinite; box-shadow: 0 0 6px rgba(192,125,111,0.4); }
+    .award-status.warnings { background: rgba(232,200,122,0.15); color: #8A7340; border-color: rgba(232,200,122,0.3); }
+    .award-status.warnings .dot { background: #E8C87A; }
+    .award-status.active { background: rgba(107,142,159,0.1); color: #4D7A8C; border-color: rgba(107,142,159,0.22); }
+    .award-status.active .dot { background: #6B8E9F; }
+    .award-status.inactive { background: rgba(176,190,197,0.12); color: #8A9BA8; border-color: rgba(176,190,197,0.2); }
+    .award-status.inactive .dot { background: #B0BEC5; }
+    @keyframes pulse-dot { 0%, 100% { transform: scale(1); box-shadow: 0 0 4px rgba(192,125,111,0.3); } 50% { transform: scale(1.3); box-shadow: 0 0 8px rgba(192,125,111,0.5); } }
+    .award-name { font-size: 16px; font-weight: 600; color: #2D3436; margin-bottom: 8px; font-family: 'Noto Serif SC', serif; }
+    .award-desc { font-size: 13px; color: #8A9BA8; line-height: 1.6; margin-bottom: 12px; }
+    .award-time { display: flex; align-items: center; gap: 6px; font-size: 12px; margin-bottom: 16px; color: #8A9BA8; }
+    .award-time.urgent { color: #C07D6F; }
+    .award-time.warnings { color: #D4A574; }
+    .award-btn { width: 100%; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; font-weight: 600; cursor: pointer; letter-spacing: 0.02em; transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); border: 1.5px solid transparent; }
+    .award-btn.primary { background: linear-gradient(135deg, #6B8E9F 0%, #7DA3B3 100%); color: #fff; border-color: transparent; box-shadow: 0 2px 8px rgba(107,142,159,0.25); }
+    .award-btn.primary:hover { background: linear-gradient(135deg, #5A7D8E 0%, #6B8E9F 100%); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(107,142,159,0.35); }
+    .award-btn.secondary { background: rgba(107,142,159,0.04); color: #8A9BA8; border: 1.5px solid rgba(107,142,159,0.18); }
+    .award-btn.secondary:hover { background: rgba(107,142,159,0.1); color: #6B8E9F; border-color: rgba(107,142,159,0.4); transform: translateY(-2px); }
+    .award-btn.warning { background: rgba(232,200,122,0.12); color: #8A7340; border: 1.5px solid rgba(232,200,122,0.25); }
+    .award-btn.warning:hover { background: rgba(232,200,122,0.2); transform: translateY(-2px); }
+    .more-card { background: linear-gradient(180deg, #FAFCFD 0%, #F3F7F8 100%); border: 2px dashed rgba(107,142,159,0.15); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 200px; cursor: default; border-radius: var(--radius-xl); }
+    .more-card .icon { width: 32px; height: 32px; margin-bottom: 10px; opacity: 0.4; font-size: 32px; transition: all 0.3s; }
+    .more-card:hover .icon { opacity: 0.7; transform: scale(1.1); }
+    .more-card .title { font-size: 14px; color: #8A9BA8; font-weight: 500; }
+    .more-card .sub { font-size: 12px; color: #B8C5CE; }
+
+    .footer { width: 100%; height: 52px; background: rgba(255,255,255,0.7); border-top: 1px solid rgba(107,142,159,0.1); display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px; color: #8A9BA8; letter-spacing: 0.02em; backdrop-filter: blur(8px); }
+    .footer a { color: #6B8E9F; }
+
+    /* 模态框 */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+    .modal-overlay.active { display: flex; }
+    .modal { background: #fff; border-radius: 20px; width: 420px; max-width: 90%; overflow: hidden; }
+    .modal.large { width: 90vw; max-width: 1400px; max-height: 95vh; }
+    .modal-header { padding: 20px 28px; border-bottom: 1px solid #E8E4DE; display: flex; align-items: center; justify-content: space-between; background: #F5F4F2; }
+    .modal-title { font-size: 18px; font-weight: 600; color: #2D3436; font-family: 'Noto Serif SC', serif; letter-spacing: -0.01em; }
+    .modal-close { width: 28px; height: 28px; border-radius: 50%; background: rgba(92,107,115,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; color: #89949E; transition: all 0.2s; }
+    .modal-close:hover { background: rgba(107,142,159,0.15); color: #6B8E9F; }
+    .modal-body { padding: 24px; max-height: calc(95vh - 70px); overflow-y: auto; overflow-x: hidden; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid #E8E4DF; display: flex; gap: 12px; justify-content: flex-end; }
+
+    .form-group { margin-bottom: 16px; }
+    .form-label { font-size: 13px; color: #2D3436; margin-bottom: 6px; display: block; font-weight: 500; }
+    .form-input { width: 100%; height: 44px; padding: 0 16px; border: 1.5px solid rgba(107,142,159,0.2); border-radius: var(--radius-md); font-size: 14px; outline: none; transition: all 0.25s; background: var(--bg-card); }
+    .form-input:focus { border-color: #6B8E9F; box-shadow: 0 0 0 4px rgba(107,142,159,0.1); }
+    textarea.form-input { height: auto; padding: 14px 16px; resize: vertical; }
+    .form-select { width: 100%; height: 44px; padding: 0 16px; border: 1.5px solid rgba(107,142,159,0.2); border-radius: var(--radius-md); font-size: 14px; outline: none; background: var(--bg-card); cursor: pointer; transition: all 0.25s; }
+    .form-select:focus { border-color: #6B8E9F; box-shadow: 0 0 0 4px rgba(107,142,159,0.1); }
+    .btn { height: 40px; padding: 0 24px; border-radius: 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94); letter-spacing: 0.02em; }
+    .btn-primary { background: linear-gradient(135deg, #6B8E9F 0%, #7DA3B3 100%); color: #fff; box-shadow: 0 2px 8px rgba(107,142,159,0.25); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(107,142,159,0.3); background: linear-gradient(135deg, #5A7D8E 0%, #6B8E9F 100%); }
+    .btn-secondary { background: transparent; color: #6B8E9F; border: 1.5px solid rgba(107,142,159,0.25); }
+    .btn-secondary:hover { border-color: #6B8E9F; background: rgba(107,142,159,0.06); }
+
+    /* 激励速递 & 首页公告 */
+    .news-list { width: 100%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .news-card { background: #fff; border-radius: var(--radius-lg); padding: 20px; border: 1px solid rgba(107,142,159,0.1); cursor: pointer; transition: all 0.3s; box-shadow: 0 1px 3px rgba(107,142,159,0.04), 0 4px 10px rgba(107,142,159,0.05); position: relative; overflow: hidden; }
+    .news-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: linear-gradient(180deg, #A8D5BA, #B8B8D1); opacity: 0.6; transition: opacity 0.3s; }
+    .news-card:hover { box-shadow: 0 4px 16px rgba(107,142,159,0.08), 0 10px 30px rgba(107,142,159,0.06); transform: translateY(-4px); border-color: rgba(107,142,159,0.18); }
+    .news-card:hover::before { opacity: 1; width: 5px; }
+    .news-item { background: #fff; border-radius: 16px; padding: 20px; margin-bottom: 16px; border: 1px solid rgba(107,142,159,0.1); cursor: pointer; transition: all 0.2s; }
+    .news-item:hover { box-shadow: 0 4px 16px rgba(107,142,159,0.06); }
+    .news-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .news-tag { padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.02em; }
+    .news-tag.notice { background: rgba(212,165,165,0.15); color: #A07070; }
+    .news-tag.update { background: rgba(232,213,183,0.2); color: #8A7340; }
+    .news-tag.info { background: rgba(107,142,159,0.1); color: #4D7A8C; }
+    .news-date { font-size: 12px; color: #8A9BA8; }
+    .news-title { font-size: 16px; font-weight: 600; color: #2D3436; margin-bottom: 6px; font-family: 'Noto Serif SC', serif; }
+    .news-summary { font-size: 13px; color: #8A9BA8; line-height: 1.6; }
+
+    /* 下载模版 */
+    .template-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; max-width: 900px; }
+    .template-card { background: #fff; border-radius: 16px; padding: 20px; border: 1px solid #E8E4DF; display: flex; align-items: flex-start; gap: 16px; }
+    .template-icon { width: 48px; height: 48px; border-radius: 12px; background: #F5F3EF; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 24px; }
+    .template-info { flex: 1; }
+    .template-name { font-size: 15px; font-weight: 500; color: #2D2D2D; margin-bottom: 4px; }
+    .template-desc { font-size: 12px; color: #8A8A8A; margin-bottom: 12px; }
+    .template-download { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: #E0E4E6; border-radius: 8px; cursor: pointer; font-size: 12px; color: #5C6B73; }
+    .template-download:hover { background: #E0EBE0; }
+
+    /* 提交申报 */
+    .apply-container { max-width: 900px; margin: 0 auto; }
+    .apply-form { background: #fff; border-radius: 20px; padding: 32px; border: 1px solid #E8E4DF; }
+    .form-section { margin-bottom: 24px; }
+    .form-section-title { font-size: 15px; font-weight: 500; color: #2D2D2D; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #E8E4DF; }
+
+    .upload-area { border: 2px dashed #DADADA; border-radius: 12px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.2s; }
+    .upload-area:hover { border-color: #6B8E9F; background: rgba(107,142,159,0.04); }
+    .upload-area.dragover { border-color: #6B8E9F; background: rgba(107,142,159,0.06); }
+    .upload-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.6; }
+    .upload-text { font-size: 14px; color: #2D2D2D; margin-bottom: 4px; }
+    .upload-hint { font-size: 12px; color: #8A8A8A; }
+
+    .file-list { margin-top: 16px; }
+    .file-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: #FAF8F5; border-radius: 8px; margin-bottom: 8px; }
+    .file-info { display: flex; align-items: center; gap: 10px; }
+    .file-icon { width: 32px; height: 32px; background: #fff; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .file-name { font-size: 13px; color: #2D2D2D; }
+    .file-size { font-size: 11px; color: #8A8A8A; }
+    .file-remove { color: #C07D6F; cursor: pointer; font-size: 16px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.2s; }
+    .file-remove:hover { background: #F5EBE7; }
+
+    .submit-btn { width: 100%; height: 54px; background: #fff; color: #2D3436; border-radius: 14px; font-size: 15px; font-weight: 600; cursor: pointer; border: 2px solid #2D3436; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 2px 8px rgba(45,52,54,0.08); transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); letter-spacing: 0.08em; font-family: 'Noto Serif SC', serif; }
+    .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(45,52,54,0.15); background: #2D3436; color: #fff; }
+    .submit-btn:disabled { background: #F5F4F2; border-color: #D8DDD0; color: #B0BEC5; cursor: not-allowed; box-shadow: none; transform: none; }
+
+    .records-section { margin-top: 32px; }
+    .records-title { font-size: 18px; font-weight: 700; color: var(--secondary); margin-bottom: 16px; }
+    .record-item { background: var(--bg-card); border-radius: var(--radius-lg); padding: 20px; border: 1px solid #EDEAE5; margin-bottom: 12px; transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94); box-shadow: 0 1px 3px rgba(92,107,115,0.04), 0 2px 8px rgba(92,107,115,0.06); }
+    .record-item:hover { transform: translateX(4px); box-shadow: 0 4px 12px rgba(92,107,115,0.08); border-color: #D8DDD0; }
+    .record-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .record-award { font-size: 14px; font-weight: 500; color: #2D2D2D; }
+    .record-status { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; border: 1.5px solid transparent; }
+    .record-status.pending { background: linear-gradient(135deg, #F0F2F3, #E8E4DE); color: #7A6B5A; border-color: #D8DDD0; }
+    .record-status.approved { background: linear-gradient(135deg, #E0E8E3, #D4E0D8); color: #5C8A6E; border-color: #A8C4B0; }
+    .record-status.rejected { background: linear-gradient(135deg, #F5EBE7, #EBDDD8); color: #8B5A4A; border-color: #D4B5A8; }
+    .record-files { display: flex; flex-wrap: wrap; gap: 8px; }
+    .record-file { padding: 4px 10px; background: #FAF8F5; border-radius: 6px; font-size: 12px; color: #5A5A5A; cursor: pointer; }
+    .record-file:hover { background: #F0F5F0; }
+    .record-time { font-size: 11px; color: #8A8A8A; margin-top: 8px; }
+
+    /* 管理员后台 */
+    .admin-tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+    .admin-tab { padding: 10px 20px; border-radius: 20px; font-size: 14px; cursor: pointer; background: #fff; border: 1px solid #E8E4DF; color: #8A8A8A; }
+    .admin-tab.active { background: #5C6B73; color: #fff; border-color: #5C6B73; }
+    .admin-card { background: #fff; border-radius: 16px; padding: 24px; border: 1px solid #E8E4DF; margin-bottom: 20px; }
+    .admin-card-title { font-size: 15px; font-weight: 500; color: #2D2D2D; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .award-config-item { padding: 16px; background: #FAF8F5; border-radius: 12px; margin-bottom: 12px; }
+    .award-config-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .award-config-name { font-size: 14px; font-weight: 500; color: #2D2D2D; }
+    .award-config-actions { display: flex; gap: 8px; }
+    .config-btn { padding: 4px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; border: none; }
+    .config-btn.edit { background: #E0E4E6; color: #5C6B73; }
+    .config-btn.delete { background: #F5EBE7; color: #8B5A4A; }
+    .config-btn.upload { background: #E8E4DF; color: #5A5A5A; }
+
+    .filter-bar { display: flex; gap: 12px; margin-bottom: 16px; align-items: center; }
+    .filter-select { height: 36px; padding: 0 12px; border: 1px solid #E8E4DF; border-radius: 8px; font-size: 13px; background: #fff; }
+    .search-input { height: 36px; padding: 0 12px; border: 1px solid #E8E4DF; border-radius: 8px; font-size: 13px; width: 200px; }
+
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th, .data-table td { padding: 12px; text-align: left; border-bottom: 1px solid #E8E4DF; font-size: 13px; }
+    .data-table th { background: #FAF8F5; font-weight: 500; color: #2D2D2D; }
+    .data-table tr:hover { background: #FAFAF8; }
+    .data-table .actions { display: flex; gap: 8px; }
+    .data-table .action-btn { padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; border: none; }
+    .data-table .view-btn { background: #E0E4E6; color: #5C6B73; }
+    .data-table .download-btn { background: #EDE8E0; color: #7A6B5A; }
+
+    .export-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #5C6B73; color: #fff; border-radius: 12px; font-size: 13px; cursor: pointer; border: none; font-weight: 500; }
+    .export-btn:hover { background: #6B8070; }
+
+    .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 20px; }
+    .page-btn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid #E8E4DF; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #8A8A8A; }
+    .page-btn.active { background: #5C6B73; color: #fff; border-color: #5C6B73; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+    .stat-card { background: var(--bg-card); border-radius: var(--radius-lg); padding: 24px; border: 1px solid #EDEAE5; box-shadow: 0 1px 3px rgba(92,107,115,0.04), 0 2px 8px rgba(92,107,115,0.06); transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+    .stat-card:hover { transform: translateY(-3px); box-shadow: 0 4px 16px rgba(92,107,115,0.08); }
+    .stat-value { font-size: 32px; font-weight: 600; color: #5C6B73; margin-bottom: 6px; font-family: 'DM Mono', monospace; }
+    .stat-label { font-size: 13px; color: #89949E; font-weight: 500; letter-spacing: 0.02em; }
+    .stat-card.primary { background: linear-gradient(135deg, #F0F2F3 0%, #E8E4DE 100%); border-color: #D8DDD0; }
+    .stat-card.primary .stat-value { color: #5C6B73; }
+    .stat-card.warning .stat-value { color: #D4A574; }
+    .stat-card.danger .stat-value { color: #C07D6F; }
+    .stat-card.success .stat-value { color: #81B29A; }
+
+    /* Toast */
+    .toast { position: fixed; top: 100px; right: 20px; padding: 16px 24px; border-radius: 16px; font-size: 14px; z-index: 2000; display: none; animation: slideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); background: var(--bg-card); box-shadow: 0 8px 24px rgba(92,107,115,0.08); border: 1px solid #E8E4DE; min-width: 200px; }
+    .toast.success { color: #81B29A; border-color: #81B29A; }
+    .toast.error { color: #C07D6F; border-color: #C07D6F; }
+    .toast.active { display: flex; align-items: center; gap: 10px; }
+    .toast .emoji { font-size: 20px; animation: bounce 0.5s; }
+    @keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+
+    .empty-state { text-align: center; padding: 40px; color: #8A8A8A; font-size: 13px; }
+    .detail-modal { width: 600px; }
+    .detail-section { margin-bottom: 16px; }
+    .detail-label { font-size: 12px; color: #8A8A8A; margin-bottom: 4px; }
+    .detail-value { font-size: 14px; color: #2D2D2D; white-space: pre-wrap; word-break: break-word; line-height: 1.6; }
+
+    /* 用户管理 */
+    .user-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #FAF8F5; border-radius: 8px; margin-bottom: 8px; }
+    .user-info-item { display: flex; align-items: center; gap: 12px; }
+    .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: #5C6B73; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 500; }
+    .user-details { flex: 1; }
+    .user-name { font-size: 14px; font-weight: 500; color: #2D2D2D; }
+    .user-meta { font-size: 12px; color: #8A8A8A; }
+    .user-badge { padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+    .user-badge.admin { background: #EDE8E0; color: #7A6B5A; }
+    .user-badge.user { background: #E0E4E6; color: #5C6B73; }
+
+    /* 申报表管理 */
+    .template-upload-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #FAF8F5; border-radius: 8px; margin-bottom: 8px; }
+    .template-file-info { display: flex; align-items: center; gap: 12px; }
+    .template-file-icon { width: 40px; height: 40px; border-radius: 8px; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .template-file-name { font-size: 14px; font-weight: 500; color: #2D2D2D; }
+    .template-file-meta { font-size: 12px; color: #8A8A8A; }
+    .template-file-actions { display: flex; gap: 8px; }
+    .no-template { text-align: center; padding: 20px; color: #8A8A8A; font-size: 13px; background: #fff; border-radius: 8px; border: 1px dashed #DADADA; }
+
+    /* 公告管理 */
+    .notice-item { padding: 16px; background: #FAF8F5; border-radius: 12px; margin-bottom: 12px; }
+    .notice-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .notice-title { font-size: 14px; font-weight: 500; color: #2D2D2D; }
+    .notice-actions { display: flex; gap: 8px; }
+    .notice-content { font-size: 13px; color: #5A5A5A; line-height: 1.6; }
+    .notice-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+    .notice-meta { font-size: 12px; color: #8A8A8A; }
+    .notice-type-badge { padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+    .notice-type-badge.notice { background: #F5EBE7; color: #8B5A4A; }
+    .notice-type-badge.update { background: #EDE8E0; color: #7A6B5A; }
+    .notice-type-badge.info { background: #E0E4E6; color: #5C6B73; }
+
+    @media (max-width: 1200px) { .awards-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 900px) { 
+      .nav-bar { padding: 0 20px; } 
+      .container { padding: 20px; } 
+      .home-layout { flex-direction: column !important; gap: 24px; } 
+      .home-left-sidebar { width: 100%; position: static; }
+      .home-right-content { width: 100%; }
+      .sidebar { width: 100%; } 
+      .awards-grid, .template-grid, .news-list { grid-template-columns: 1fr; } 
+      .admin-layout { flex-direction: column; } 
+      .admin-sidebar { width: 100%; } 
+      .mini-stats-row { gap: 4px; }
+      .mini-stat-num { font-size: 18px; }
+      .mini-stat-label { font-size: 9px; }
+      .banner { flex-direction: column; text-align: center; padding: 24px; }
+      .banner-desc { max-width: 100%; }
+      .banner-illustration { order: -1; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- 导航栏 -->
+<nav class="nav-bar">
+  <div class="nav-logo">
+    <div class="nav-logo-icon">🏆</div>
+    <div>
+      <span>激励申报入口</span>
+      <div style="font-size:11px;color:#8A8A8A;">激励速递·下载模版·提交申报</div>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <div class="nav-tab active" data-page="home">首页</div>
+    <div class="nav-tab" data-page="apply">提交申报</div>
+    <div class="nav-tab" data-page="admin" id="adminTab" style="display:none;">管理后台</div>
+  </div>
+  <div class="nav-user" id="navUser"></div>
+</nav>
+
+<!-- 首页 -->
+<div class="container active" id="page-home">
+  <div class="home-layout">
+    <!-- 左侧边栏：申报概览 + 时间轴 + 我的申报 -->
+    <div class="home-left-sidebar">
+      <!-- 迷你申报概览 -->
+      <div id="homeStats" style="display:none;margin-bottom:20px;"></div>
+      <div class="sidebar-title">🕐 激励时间轴</div>
+      <div id="homeTimeline"></div>
+      <div id="homeMyRecords" style="margin-top:20px;"></div>
+    </div>
+    <!-- 右侧主内容区 -->
+    <div class="home-right-content">
+      <div class="home-banner-wrapper" id="homeBannerWrapper">
+        <div class="banner" id="homeBanner">
+          <div class="banner-content">
+            <div class="banner-tag" id="bannerTag">申报已开启</div>
+            <div class="banner-title" id="bannerTitle">2026上半年技术突破奖申报已开启！</div>
+            <div class="banner-desc" id="bannerDesc">线安全线激励Q2申报将于4月下旬截止，请及时提交</div>
+          </div>
+          <div class="banner-illustration">
+            <div style="width:140px;height:140px;display:flex;align-items:center;justify-content:center;font-size:80px;">🏆</div>
+          </div>
+          <div class="banner-btn" id="bannerBtn">立即申报 →</div>
+        </div>
+      </div>
+      <!-- 全部奖项 -->
+      <div class="section-header" style="margin-top:32px;">
+        <div class="section-title">🏅 全部奖项</div>
+      </div>
+      <div class="awards-grid" id="awardsGrid"></div>
+      <!-- 最新公告 -->
+      <div class="section-header" style="margin-top:32px;">
+        <div class="section-title">📢 最新公告</div>
+      </div>
+      <div class="news-list" id="homeNewsList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 奖项详情弹窗 -->
+<div class="modal-overlay" id="awardRuleModal">
+  <div class="modal detail-modal">
+    <div class="modal-header"><div class="modal-title" id="awardRuleTitle">奖项激励规则</div><div class="modal-close" onclick="closeModal('awardRuleModal')">×</div></div>
+    <div class="modal-body" id="awardRuleContent"></div>
+  </div>
+</div>
+
+<!-- 图片预览弹窗 -->
+<div class="modal-overlay" id="imagePreviewModal" style="background:rgba(0,0,0,0.9);" onclick="closeModal('imagePreviewModal')">
+  <div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);max-width:95vw;max-height:95vh;">
+    <img id="imagePreviewImg" src="" style="max-width:95vw;max-height:95vh;border-radius:8px;">
+  </div>
+  <div style="position:fixed;top:20px;right:20px;color:white;font-size:24px;cursor:pointer;" onclick="closeModal('imagePreviewModal')">×</div>
+</div>
+
+<!-- 公告详情弹窗 -->
+<div class="modal-overlay" id="noticeDetailModal">
+  <div class="modal" style="width:600px;max-width:90vw;">
+    <div class="modal-header"><div class="modal-title" id="noticeDetailTitle">公告详情</div><div class="modal-close" onclick="closeModal('noticeDetailModal')">×</div></div>
+    <div class="modal-body" id="noticeDetailContent" style="max-height:60vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- 申报表模板选择弹窗 -->
+<div class="modal-overlay" id="templateSelectModal">
+  <div class="modal" style="width:500px;max-width:90vw;">
+    <div class="modal-header"><div class="modal-title">📥 选择申报表模板</div><div class="modal-close" onclick="closeModal('templateSelectModal')">×</div></div>
+    <div class="modal-body" id="templateSelectList" style="max-height:60vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- 数据备份与恢复弹窗 -->
+<div class="modal-overlay" id="dataBackupModal">
+  <div class="modal" style="width:600px;max-width:90vw;">
+    <div class="modal-header"><div class="modal-title">💾 数据备份与恢复</div><div class="modal-close" onclick="closeModal('dataBackupModal')">×</div></div>
+    <div class="modal-body" style="max-height:70vh;overflow-y:auto;">
+      <div style="margin-bottom:24px;">
+        <div style="font-size:15px;font-weight:600;color:#2D2D2D;margin-bottom:8px;">💾 备份数据</div>
+        <div style="font-size:13px;color:#8A8A8A;margin-bottom:12px;">导出所有数据为 JSON 文件，建议定期备份以防数据丢失</div>
+        <button class="btn btn-primary" style="height:44px;font-size:14px;" onclick="exportAllData()">📥 一键导出全部数据</button>
+      </div>
+      
+      <div style="border-top:1px solid #E8E4DF;padding-top:24px;margin-bottom:24px;">
+        <div style="font-size:15px;font-weight:600;color:#2D2D2D;margin-bottom:8px;">📤 恢复数据</div>
+        <div style="font-size:13px;color:#8A8A8A;margin-bottom:12px;">导入之前备份的 JSON 文件，将覆盖现有所有数据</div>
+        <div style="background:#FFF5F5;border:1px solid #FFBABA;border-radius:8px;padding:12px;margin-bottom:12px;font-size:12px;color:#D63031;">
+          ⚠️ 警告：恢复数据将覆盖现有数据，请确保已做好备份后再操作！
+        </div>
+        <button class="btn btn-secondary" style="height:44px;font-size:14px;" onclick="document.getElementById('importDataInput').click()">📤 选择备份文件导入</button>
+        <input type="file" id="importDataInput" accept=".json" onchange="handleImportData(event)" style="display:none;">
+      </div>
+      
+      <div style="border-top:1px solid #E8E4DF;padding-top:24px;">
+        <div style="font-size:15px;font-weight:600;color:#2D2D2D;margin-bottom:8px;">📋 当前数据概览</div>
+        <div id="dataOverview" style="font-size:13px;color:#5A5A5A;line-height:1.8;"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('dataBackupModal')">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- 激励速递已移除，奖项详情弹窗移至首页区域 -->
+
+<!-- 下载模版 (已禁用，功能整合到激励速递) -->
+<div class="container" id="page-templates" style="display:none;">
+  <div class="template-grid" id="templateGrid"></div>
+</div>
+
+<!-- 提交申报 -->
+<div class="container" id="page-apply">
+  <div class="apply-container">
+    <div class="apply-form">
+      <div class="form-section">
+        <div class="form-section-title">选择奖项</div>
+        <div class="form-group">
+          <select class="form-select" id="selectAward"><option value="">请选择申报奖项</option></select>
+        </div>
+        <div id="awardTemplateInfo" style="display:none;margin-top:12px;">
+          <div style="padding:12px;background:#F0F5F0;border-radius:8px;display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:13px;font-weight:500;color:#2D2D2D;">📋 申报表已就绪</div>
+              <div style="font-size:12px;color:#8A8A8A;margin-top:4px;" id="templateFileName"></div>
+            </div>
+            <button class="btn btn-primary" style="height:32px;font-size:12px;" onclick="downloadAwardTemplate()">📥 下载申报表</button>
+          </div>
+        </div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title">申报信息</div>
+        <div class="form-group">
+          <label class="form-label"><span style="color:#C07D6F;">*</span> 接口人姓名</label>
+          <input type="text" class="form-input" id="applyName" placeholder="请输入接口人姓名">
+        </div>
+        <div class="form-group">
+          <label class="form-label"><span style="color:#C07D6F;">*</span> 申报项目名称</label>
+          <input type="text" class="form-input" id="applyTitle" placeholder="请输入申报项目名称">
+        </div>
+        <div class="form-group">
+          <label class="form-label"><span style="color:#C07D6F;">*</span> 申报排序</label>
+          <input type="number" class="form-input" id="applySort" placeholder="请输入排序数字，如：1、2、3..." min="1">
+        </div>
+        <!-- 下载模板按钮 -->
+        <div style="margin-bottom:16px;">
+          <button class="submit-btn" style="height:40px;font-size:14px;border-width:1.5px;" onclick="showTemplateSelectModal()">📥 下载申报表模板</button>
+        </div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title"><span style="color:#C07D6F;">*</span> 上传附件</div>
+        <div class="upload-area" id="uploadArea">
+          <div class="upload-icon">📤</div>
+          <div class="upload-text">点击或拖拽文件到此处上传</div>
+          <div class="upload-hint">支持 PDF、Word、Excel、图片，单个文件不超过 10MB</div>
+        </div>
+        <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
+        <div class="file-list" id="fileList"></div>
+      </div>
+      <div id="editModeInfo" style="display:none;margin-bottom:16px;padding:12px;background:#F0F2F3;border-radius:8px;border:1px solid #D8DDD0;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="font-size:13px;font-weight:500;color:#2D2D2D;">✏️ 编辑模式下</div>
+            <div style="font-size:12px;color:#8A8A8A;margin-top:4px;" id="editModeHint"></div>
+          </div>
+          <button class="btn btn-secondary" style="height:32px;font-size:12px;" onclick="cancelEdit()">取消编辑</button>
+        </div>
+      </div>
+      <button class="submit-btn" id="submitBtn" onclick="submitApplication()">📥 提交申报</button>
+    </div>
+    <div class="records-section">
+      <div class="records-title">我的申报记录</div>
+      <div id="myRecords"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 管理员后台 - 左右布局 -->
+<div class="container" id="page-admin">
+  <div class="admin-layout">
+    <!-- 左侧菜单 -->
+    <div class="admin-sidebar">
+      <div class="admin-sidebar-title">🏆 激励申报管理</div>
+      <div class="admin-menu-item active" data-admin-panel="overview">
+        <span class="admin-menu-icon">📊</span> 数据看板
+      </div>
+      <div class="admin-menu-item" data-admin-panel="awards">
+        <span class="admin-menu-icon">🏅</span> 奖项管理
+      </div>
+      <div class="admin-menu-item" data-admin-panel="timeline">
+        <span class="admin-menu-icon">⏰</span> 时间线管理
+      </div>
+      <div class="admin-menu-item" data-admin-panel="templates">
+        <span class="admin-menu-icon">📁</span> 模版管理
+      </div>
+      <div class="admin-menu-item" data-admin-panel="banners">
+        <span class="admin-menu-icon">🎯</span> 横幅管理
+      </div>
+      <div class="admin-menu-item" data-admin-panel="submissions">
+        <span class="admin-menu-icon">📋</span> 申报记录
+      </div>
+      <div class="admin-menu-item" data-admin-panel="users">
+        <span class="admin-menu-icon">👥</span> 用户管理
+      </div>
+      <div class="admin-menu-item" data-admin-panel="notices">
+        <span class="admin-menu-icon">📢</span> 公告管理
+      </div>
+      <div class="admin-menu-item" data-admin-panel="editlogs">
+        <span class="admin-menu-icon">📝</span> 修改记录
+      </div>
+      <div class="admin-menu-item" onclick="showDataBackupModal()">
+        <span class="admin-menu-icon">💾</span> 数据备份
+      </div>
+      <div style="padding: 16px 20px; margin-top: 12px; border-top: 1px solid #E8E4DF;">
+        <div id="adminUserInfo" style="display:flex;align-items:center;gap:10px;">
+          <div style="width:32px;height:32px;border-radius:50%;background:#5C6B73;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:500;">管</div>
+          <div>
+            <div style="font-size:13px;font-weight:500;color:#2D2D2D;">Hi, 管理员</div>
+          </div>
+        </div>
+        <button class="btn btn-secondary" style="margin-top:12px;width:100%;justify-content:center;" onclick="logout()">退出</button>
+      </div>
+    </div>
+    <!-- 右侧内容 -->
+    <div class="admin-main">
+      <!-- 数据看板 -->
+      <div id="panel-overview" class="admin-panel">
+        <div class="admin-header">
+          <div class="admin-header-title">📊 数据看板</div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card primary"><div class="stat-value" id="statTotal">0</div><div class="stat-label">总申报数</div></div>
+          <div class="stat-card warning"><div class="stat-value" id="statPending">0</div><div class="stat-label">待审核</div></div>
+          <div class="stat-card"><div class="stat-value" id="statAwards">0</div><div class="stat-label">进行中奖项</div></div>
+          <div class="stat-card danger"><div class="stat-value" id="statToday">0</div><div class="stat-label">今日新增</div></div>
+        </div>
+        <div class="admin-card">
+          <div class="admin-card-title">📈 申报趋势（近7天）</div>
+          <div style="height:200px;display:flex;align-items:flex-end;justify-content:center;gap:20px;padding:20px;">
+            <div id="chartBars"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 奖项管理 -->
+      <div id="panel-awards" class="admin-panel" style="display:none;">
+        <div class="admin-header">
+          <div class="admin-header-title">🏅 奖项管理</div>
+          <button class="btn btn-primary" onclick="showAddAwardModal()">+ 添加奖项</button>
+        </div>
+        <div class="admin-card">
+          <div class="admin-card-title">奖项列表</div>
+          <div id="adminAwardsList"></div>
+        </div>
+      </div>
+
+      <!-- 时间线管理 -->
+      <div id="panel-timeline" class="admin-panel" style="display:none;">
+        <div class="admin-header">
+          <div class="admin-header-title">⏰ 时间线管理</div>
+          <button class="btn btn-primary" onclick="showAddTimelineModal()">+ 添加节点</button>
+        </div>
+        <div class="admin-card">
+          <div class="admin-card-title">年度时间轴</div>
+          <div id="timelineList"></div>
+        </div>
+      </div>
+
+      <!-- 模版管理 -->
+      <div id="panel-templates" class="admin-panel" style="display:none;">
+        <div class="admin-header">
+          <div class="admin-header-title">📁 模版管理</div>
+        </div>
+        <div class="admin-card">
+          <div class="admin-card-title">奖项申报表</div>
+          <p style="font-size:13px;color:#8A8A8A;margin-bottom:16px;">为各奖项上传专属的申报表模板，用户在提交申报时可下载使用。支持 Excel(.xlsx/.xls)、Word(.doc/.docx)、PDF(.pdf) 格式。</p>
+          <div class="form-group">
+            <label class="form-label">选择奖项</label>
+            <select class="form-select" id="templateAwardSelect" onchange="loadAwardTemplates(); document.getElementById('templateFileInput').value='';">
+              <option value="">请选择奖项</option>
+            </select>
+          </div>
+          <div id="awardTemplateList" class="no-template">请先选择奖项</div>
+          <div style="margin-top:16px;">
+            <button class="btn btn-primary" id="uploadTemplateBtn" onclick="triggerTemplateUpload()">📤 上传申报表</button>
+            <input type="file" id="templateFileInput" style="display:none;" accept=".pdf,.doc,.docx,.xls,.xlsx" onchange="uploadAwardTemplate(event)">
+          </div>
+        </div>
+        <div class="admin-card">
+          <div class="admin-card-title">通用模版</div>
+          <div id="commonTemplateList"></div>
+        </div>
+      </div>
+
+      <!-- 横幅管理 -->
+      <div id="panel-banners" class="admin-panel" style="display:none;">
+        <div class="admin-header">
+          <div class="admin-header-title">🎯 首页横幅管理</div>
+          <button class="btn btn-primary" onclick="showAddBannerModal()">+ 添加横幅</button>
+        </div>
+        <div class="admin-card">
+          <div class="admin-card-title">横幅列表</div>
+          <div id="adminBannersList"></div>
+        </div>
+      </div>
+
+      <!-- 申报记录 -->
+      <div id="panel-submissions" class="admin-panel" style="display:none;">
+        <div class="admin-header">
+          <div class="admin-header-title">📋 申报记录</div>
+          <div class="admin-header-right">
+            <button class="export-btn" onclick="exportAllSubmissions()">📥 导出全部</button>
+          </div>
+        </div>
+        <div class="admin-card">
+          <div class="filter-bar">
+            <select class="filter-select" id="filterAward" onchange="renderSubmissions()"><option value="">全部奖项</option></select>
+            <select class="filter-select" id="filterStatus" onchange="renderSubmissions()">
+              <option value="">全部状态</option><option value="pending">待审核</option><option value="approved">已通过</option><option value="rejected">已驳回</option>
+            </select>
+            <input type="text" class="search-input" id="searchKeyword" placeholder="搜索申报人/标题" oninput="renderSubmissions()">
+          </div>
+          <div id="batchActionBar" style="display:none;padding:12px 16px;background:#F0F2F3;border:1px solid #D8DDD0;border-radius:8px;margin-bottom:12px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div style="display:flex;align-items:center;gap:12px;">
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px;">
+                  <input type="checkbox" id="selectAllSubmissions" onchange="toggleSelectAllSubmissions()"> 全选
+                </label>
+                <span style="font-size:14px;color:#8A8A8A;">已选择 <span id="selectedCount">0</span> 项</span>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <button class="btn btn-primary" style="height:32px;font-size:13px;" onclick="batchApproveSubmissions()">✅ 批量通过</button>
+                <button class="btn btn-secondary" style="height:32px;font-size:13px;background:#FF6B6B;color:#fff;" onclick="showBatchRejectModal()">❌ 批量驳回</button>
+              </div>
+            </div>
+          </div>
+          <table class="data-table">
+            <thead><tr><th style="width:40px;"><input type="checkbox" id="selectAllSubmissionsHeader" onchange="toggleSelectAllSubmissions()"></th><th>申报人</th><th>奖项</th><th>申报标题</th><th>附件</th><th>提交时间</th><th>状态</th><th>操作</th></tr></thead>
+            <tbody id="submissionsTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 用户管理 -->
+      <div id="panel-users" class="admin-panel" style="display:none;">
+        <div class="admin-header">
+          <div class="admin-header-title">👥 用户管理</div>
+          <button class="btn btn-primary" onclick="showAddUserModal()">+ 添加用户</button>
+        </div>
+        <div class="admin-card">
+          <div class="admin-card-title">用户列表</div>
+          <div class="filter-bar">
+            <input type="text" class="search-input" id="userSearchKeyword" placeholder="搜索用户名" oninput="renderUsers()">
+          </div>
+          <div id="usersList"></div>
+        </div>
+      </div>
+
+      <!-- 公告管理 -->
+      <div id="panel-notices" class="admin-panel" style="display:none;">
+        <div class="admin-header">
+          <div class="admin-header-title">📢 公告管理</div>
+          <button class="btn btn-primary" onclick="showAddNoticeModal()">+ 发布公告</button>
+        </div>
+        <div class="admin-card">
+          <div class="admin-card-title">公告列表</div>
+          <div id="noticesList"></div>
+        </div>
+      </div>
+
+      <!-- 修改记录 -->
+      <div id="panel-editlogs" class="admin-panel" style="display:none;">
+        <div class="admin-header">
+          <div class="admin-header-title">📝 修改记录</div>
+          <div class="admin-header-right">
+            <button class="export-btn" onclick="downloadAllAttachments()">📦 下载所有附件</button>
+            <button class="export-btn" onclick="exportEditLogs()">📥 导出记录</button>
+          </div>
+        </div>
+        <div class="admin-card">
+          <div class="admin-card-title">申报修改历史</div>
+          <div id="editLogsList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 底部 -->
+<footer class="footer">💬 如有疑问，请联系 <a href="#">v_yitcai</a></footer>
+
+<!-- 登录模态框 -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">登录</div><div class="modal-close" onclick="closeModal('loginModal')">×</div></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">用户名</label><input type="text" class="form-input" id="loginUsername" placeholder="请输入用户名"></div>
+      <div class="form-group"><label class="form-label">密码</label><input type="password" class="form-input" id="loginPassword" placeholder="请输入密码"></div>
+      <div style="font-size:13px;margin-top:16px;text-align:center;">
+        <span style="color:#5C6B73;font-weight:500;cursor:pointer;text-decoration:underline;" onclick="showRegisterModal()">没有账号？立即注册 →</span>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('loginModal')">取消</button><button class="btn btn-primary" onclick="doLogin()">登录</button></div>
+  </div>
+</div>
+
+<!-- 注册模态框 -->
+<div class="modal-overlay" id="registerModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">📝 用户注册</div><div class="modal-close" onclick="closeModal('registerModal')">×</div></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label"><span style="color:#C07D6F;">*</span> 用户名</label><input type="text" class="form-input" id="regUsername" placeholder="请输入用户名（用于登录）"></div>
+      <div class="form-group"><label class="form-label"><span style="color:#C07D6F;">*</span> 设置密码</label><input type="password" class="form-input" id="regPassword" placeholder="请设置密码"></div>
+      <div class="form-group"><label class="form-label"><span style="color:#C07D6F;">*</span> 确认密码</label><input type="password" class="form-input" id="regPassword2" placeholder="请再次输入密码"></div>
+      <div style="font-size:12px;color:#7A6B5A;margin-top:12px;padding:12px;background:#F0F2F3;border-radius:8px;border:1px solid #D8DDD0;">
+        <p style="margin-bottom:6px;">⚠️ 重要提醒：</p>
+        <p>• 密码只能设置一次，设置后无法自行修改</p>
+        <p>• 如忘记密码，请联系 <strong>v_yitcai</strong> 重置</p>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('registerModal')">取消</button><button class="btn btn-primary" onclick="doRegister()">注册</button></div>
+  </div>
+</div>
+
+<!-- 设置密码模态框 -->
+<div class="modal-overlay" id="setPasswordModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">🔐 设置密码</div><div class="modal-close" onclick="closeModal('setPasswordModal')">×</div></div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:#5A5A5A;margin-bottom:16px;">您是首次登录，请设置登录密码以保护您的账号安全。</p>
+      <div class="form-group"><label class="form-label">设置密码</label><input type="password" class="form-input" id="setPassword" placeholder="请输入密码"></div>
+      <div class="form-group"><label class="form-label">确认密码</label><input type="password" class="form-input" id="confirmPassword" placeholder="请再次输入密码"></div>
+      <div style="font-size:12px;color:#7A6B5A;margin-top:12px;padding:10px;background:#F0F2F3;border-radius:8px;border:1px solid #D8DDD0;">
+        ⚠️ 如忘记密码请联系 <strong>v_yitcai</strong>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-primary" onclick="savePassword()">确认设置</button></div>
+  </div>
+</div>
+
+<!-- 奖项编辑模态框 -->
+<div class="modal-overlay" id="awardModal">
+  <div class="modal" style="width:520px;">
+    <div class="modal-header"><div class="modal-title" id="awardModalTitle">添加奖项</div><div class="modal-close" onclick="closeModal('awardModal')">×</div></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">奖项名称</label><input type="text" class="form-input" id="awardName" placeholder="如：腾讯技术突破奖"></div>
+      <div class="form-group"><label class="form-label">奖项描述</label><textarea class="form-input" id="awardDesc" rows="2" placeholder="简要描述奖项"></textarea></div>
+      <div class="form-group"><label class="form-label">激励导向</label><input type="text" class="form-input" id="awardDirection" placeholder="如：表彰技术突破创新"></div>
+      <div class="form-group"><label class="form-label">评选方式</label>
+        <input type="text" class="form-input" id="awardMethod" placeholder="请输入评选方式，如：评审委员会投票">
+      </div>
+      <div class="form-group"><label class="form-label">申报截止时间</label><input type="date" class="form-input" id="awardDeadline"></div>
+      <div class="form-group"><label class="form-label">状态</label>
+        <select class="form-select" id="awardStatus"><option value="active">进行中</option><option value="pending">未开放</option><option value="closed">已结束</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">激励规则图片</label>
+        <div class="upload-area" id="ruleImageUpload" style="padding:20px;">
+          <div class="upload-icon">📷</div>
+          <div class="upload-text">点击上传激励规则图片（支持多张）</div>
+          <div class="upload-hint">支持 JPG、PNG、GIF、WEBP 格式</div>
+        </div>
+        <input type="file" id="ruleImageInput" style="display:none;" accept=".jpg,.jpeg,.png,.gif,.webp" multiple onchange="handleRuleImageUpload(event)">
+        <div id="ruleImagePreviewContainer" style="display:none;margin-top:12px;"></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('awardModal')">取消</button><button class="btn btn-primary" onclick="saveAward()">保存</button></div>
+  </div>
+</div>
+
+<!-- 详情模态框 -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal detail-modal">
+    <div class="modal-header"><div class="modal-title">申报详情</div><div class="modal-close" onclick="closeModal('detailModal')">×</div></div>
+    <div class="modal-body" id="detailContent"></div>
+    <div class="modal-footer" style="flex-wrap:wrap;gap:8px;">
+      <select class="form-select" id="auditStatus" style="width:auto;" onchange="toggleRejectReason()"><option value="pending">待审核</option><option value="approved">通过</option><option value="rejected">驳回</option></select>
+      <input type="text" id="rejectReason" placeholder="请填写驳回原因（如需驳回）" style="flex:1;min-width:200px;padding:8px 12px;border:1px solid #E8E4DF;border-radius:8px;font-size:14px;display:none;">
+      <button class="btn btn-primary" onclick="updateStatus()">更新状态</button>
+    </div>
+  </div>
+</div>
+
+<!-- 批量驳回弹窗 -->
+<div class="modal-overlay" id="batchRejectModal">
+  <div class="modal" style="width:450px;">
+    <div class="modal-header"><div class="modal-title">❌ 批量驳回</div><div class="modal-close" onclick="closeModal('batchRejectModal')">×</div></div>
+    <div class="modal-body">
+      <p style="margin-bottom:16px;font-size:14px;color:#5A5A5A;">确定要驳回 <strong id="batchRejectCount">0</strong> 项申报吗？</p>
+      <div style="margin-bottom:8px;font-size:14px;font-weight:500;color:#2D2D2D;">驳回原因（必填）</div>
+      <textarea id="batchRejectReason" rows="3" placeholder="请输入驳回原因，所有选中项将使用相同原因" style="width:100%;padding:10px 12px;border:1px solid #E8E4DF;border-radius:8px;font-size:14px;resize:vertical;"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('batchRejectModal')">取消</button>
+      <button class="btn btn-danger" style="background:#FF6B6B;" onclick="confirmBatchReject()">确认驳回</button>
+    </div>
+  </div>
+</div>
+
+<!-- 添加用户模态框 -->
+<div class="modal-overlay" id="userModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title" id="userModalTitle">添加用户</div><div class="modal-close" onclick="closeModal('userModal')">×</div></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">用户名</label><input type="text" class="form-input" id="userName" placeholder="请输入用户名"></div>
+      <div class="form-group"><label class="form-label">密码</label><input type="password" class="form-input" id="userPassword" placeholder="请输入密码"></div>
+      <div id="userPasswordHint" style="font-size:12px;color:#8A8A8A;margin-bottom:16px;">留空则保持不变</div>
+      <div class="form-group"><label class="form-label">角色</label>
+        <select class="form-select" id="userRole"><option value="user">普通用户</option><option value="admin">管理员</option></select>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('userModal')">取消</button><button class="btn btn-primary" onclick="saveUser()">保存</button></div>
+  </div>
+</div>
+
+<!-- 添加公告模态框 -->
+<!-- 横幅编辑弹窗 -->
+<div class="modal-overlay" id="bannerEditModal">
+  <div class="modal" style="width:500px;">
+    <div class="modal-header"><div class="modal-title" id="bannerEditTitle">编辑横幅</div><div class="modal-close" onclick="closeModal('bannerEditModal')">×</div></div>
+    <div class="modal-body" style="max-height:60vh;overflow-y:auto;">
+      <div class="form-group">
+        <label>标签文字</label>
+        <input type="text" id="bannerTag" placeholder="如：申报已开启" style="width:100%;padding:10px;border:1px solid #E8E4DF;border-radius:8px;font-size:14px;">
+      </div>
+      <div class="form-group" style="margin-top:12px;">
+        <label>标题</label>
+        <input type="text" id="bannerEditTitle2" placeholder="横幅主标题" style="width:100%;padding:10px;border:1px solid #E8E4DF;border-radius:8px;font-size:14px;">
+      </div>
+      <div class="form-group" style="margin-top:12px;">
+        <label>描述</label>
+        <textarea id="bannerEditDesc" placeholder="横幅描述文字" rows="2" style="width:100%;padding:10px;border:1px solid #E8E4DF;border-radius:8px;font-size:14px;resize:vertical;"></textarea>
+      </div>
+      <div class="form-group" style="margin-top:12px;">
+        <label>跳转链接</label>
+        <select id="bannerLinkType" style="width:100%;padding:10px;border:1px solid #E8E4DF;border-radius:8px;font-size:14px;">
+          <option value="apply">跳转至申报页面</option>
+          <option value="none">不跳转</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-top:12px;display:flex;align-items:center;gap:8px;">
+        <input type="checkbox" id="bannerActive" checked>
+        <label for="bannerActive" style="margin:0;font-size:14px;">设为显示（启用此横幅）</label>
+      </div>
+      <div style="margin-top:20px;text-align:center;">
+        <button class="btn btn-primary" style="width:100%;height:44px;" onclick="saveBanner()">保存横幅</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="noticeModal">
+  <div class="modal" style="width:500px;">
+    <div class="modal-header"><div class="modal-title" id="noticeModalTitle">发布公告</div><div class="modal-close" onclick="closeModal('noticeModal')">×</div></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">公告标题</label><input type="text" class="form-input" id="noticeTitle" placeholder="请输入公告标题"></div>
+      <div class="form-group"><label class="form-label">公告类型</label>
+        <select class="form-select" id="noticeType"><option value="notice">通知</option><option value="update">更新</option><option value="info">资讯</option></select>
+      </div>
+      <div class="form-group"><label class="form-label">公告内容</label><textarea class="form-input" id="noticeContent" rows="4" placeholder="请输入公告内容"></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('noticeModal')">取消</button><button class="btn btn-primary" onclick="saveNotice()">发布</button></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ==================== 后端 API 配置 ====================
+// 服务器IP: 10.67.107.56
+// 用于内网访问：'http://10.67.107.56:3001/api'
+// 用于公网访问（ngrok）：空字符串使用相对路径
+// 后端地址
+// 本地开发：'http://10.67.107.56:3001'
+// Railway 生产环境：
+const API_BASE = 'https://jl-backend-production.up.railway.app';
+let _authToken = localStorage.getItem('authToken') || null;
+
+// 通用 HTTP 请求函数
+async function apiRequest(method, path, body) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (_authToken) headers['Authorization'] = 'Bearer ' + _authToken;
+  const opts = { method, headers };
+  if (body) opts.body = JSON.stringify(body);
+  const resp = await fetch(API_BASE + path, opts);
+  const json = await resp.json();
+  if (!resp.ok) throw new Error(json.message || '请求失败');
+  return json;
+}
+const api = {
+  get: (p) => apiRequest('GET', p),
+  post: (p, b) => apiRequest('POST', p, b),
+  put: (p, b) => apiRequest('PUT', p, b),
+  del: (p, b) => apiRequest('DELETE', p, b),
+};
+
+// 检查后端是否可用（增加超时，避免网络延迟导致误判）
+let backendAvailable = false;
+async function checkBackend() {
+  try {
+    await fetch(API_BASE + '/health', { signal: AbortSignal.timeout(5000) });
+    backendAvailable = true;
+  } catch(e) {
+    backendAvailable = false;
+    console.warn('[API] 后端不可用，使用本地数据模式');
+  }
+}
+
+// ==================== 默认数据 ====================
+const DEFAULT_AWARDS = [
+  { id: 'tech', name: '腾讯技术突破奖', desc: '表彰在关键技术领域实现重大突破的团队与个人', status: 'active', deadline: '2026-04-24', direction: '技术创新', method: '评审委员会评选', icon: 'star', ruleImage: null },
+  { id: 'annual', name: 'BG年度大奖', desc: '表彰年度内在业务经营、产品创新等方面表现卓越的团队', status: 'pending', deadline: '2026-11-01', direction: '业务卓越', method: '全员投票评选', icon: 'trophy', ruleImage: null },
+  { id: 'security', name: '线安全线激励', desc: '针对信息安全相关工作的季度性专项激励申报', status: 'active', deadline: '2026-04-30', direction: '安全贡献', method: '数据评选', icon: 'shield', ruleImage: null },
+  { id: 'sustain', name: '腾讯可持续社会价值奖', desc: '表彰在可持续发展和社会价值创造方面做出卓越贡献的团队', status: 'pending', deadline: '2026-10-01', direction: '社会价值', method: '评审委员会评选', icon: 'leaf', ruleImage: null },
+  { id: 'mentor', name: '优秀导师', desc: '表彰在人才培养中发挥重要带领作用的导师和培训者', status: 'pending', deadline: '2026-01-15', direction: '人才培养', method: '全员投票评选', icon: 'book', ruleImage: null }
+];
+const DEFAULT_TEMPLATES = [
+  { id: 1, name: '技术突破奖申报表', desc: '用于申报腾讯技术突破奖的标准化模板', file: 'template_tech.xlsx', awardId: 'tech', type: 'award' },
+  { id: 2, name: '年度大奖申报材料', desc: 'BG年度大奖的综合申报材料模板', file: 'template_annual.docx', awardId: 'annual', type: 'award' },
+  { id: 3, name: '安全线激励申报单', desc: '线安全线激励的专项申报表格', file: 'template_security.pdf', awardId: 'security', type: 'award' },
+  { id: 4, name: '社会价值奖申报指南', desc: '可持续社会价值奖的申报说明及模板', file: 'template_sustain.pdf', awardId: 'sustain', type: 'award' }
+];
+const DEFAULT_NOTICES = [
+  { id: 1, title: '2026上半年技术突破奖申报正式启动', content: '经评审委员会审议，2026上半年技术突破奖申报工作于4月15日正式启动，请各部门积极参与。', type: 'notice', date: '2026-04-15' },
+  { id: 2, title: '线安全线激励Q1申报结果公示', content: '线安全线激励Q1季度申报已完成评审，共有12个团队/个人获得激励，具体名单详见附件。', type: 'update', date: '2026-04-10' },
+  { id: 3, title: '平台功能升级通知', content: '为提升用户体验，激励奖项平台已完成V2.0版本升级，新增文件批量上传、申报进度追踪等功能。', type: 'info', date: '2026-04-05' }
+];
+const DEFAULT_TIMELINES = [
+  { id: 1, time: '4月下旬', icon: 'shield', title: '线安全线激励 Q2申报', status: 'active', color: 'yellow' },
+  { id: 2, time: '4.24', icon: 'star', title: '腾讯技术突破奖 初审', status: 'urgent', color: 'red' },
+  { id: 3, time: '5月 / 10月', icon: 'globe', title: '腾讯可持续社会价值奖', status: 'inactive', color: 'gray' },
+  { id: 4, time: '11月', icon: 'trophy', title: 'BG年度大奖 申报开启', status: 'inactive', color: 'gray' }
+];
+let bannerList = [];
+const DEFAULT_BANNERS = [
+  { id: 1, tag: '申报已开启', title: '2026上半年技术突破奖申报已开启！', desc: '线安全线激励Q2申报将于4月下旬截止，请及时提交', linkType: 'apply', active: true }
+];
+
+// ==================== 数据存储 ====================
+let currentUser = null;
+let awards = [];
+let applications = [];
+let users = [];
+let templates = [];
+let noticeList = [];
+let editLogs = [];
+let timelines = [];
+
+// 初始化数据（处理localStorage损坏或为空的情况）
+function initData() {
+  try {
+    const storedUser = localStorage.getItem('currentUser');
+    currentUser = storedUser ? JSON.parse(storedUser) : null;
+  } catch(e) { currentUser = null; }
+  
+  try {
+    const storedAwards = localStorage.getItem('awards');
+    awards = (storedAwards && storedAwards !== 'null' && storedAwards !== '[]') ? JSON.parse(storedAwards) : DEFAULT_AWARDS;
+  } catch(e) { awards = DEFAULT_AWARDS; }
+  
+  try {
+    const storedApps = localStorage.getItem('applications');
+    applications = (storedApps && storedApps !== 'null' && storedApps !== '[]') ? JSON.parse(storedApps) : [];
+  } catch(e) { applications = []; }
+  
+  try {
+    const storedUsers = localStorage.getItem('users');
+    users = (storedUsers && storedUsers !== 'null' && storedUsers !== '[]') ? JSON.parse(storedUsers) : [];
+  } catch(e) { users = []; }
+  
+  try {
+    const storedTemplates = localStorage.getItem('templates');
+    templates = (storedTemplates && storedTemplates !== 'null' && storedTemplates !== '[]') ? JSON.parse(storedTemplates) : DEFAULT_TEMPLATES;
+  } catch(e) { templates = DEFAULT_TEMPLATES; }
+  
+  try {
+    const storedNotices = localStorage.getItem('noticeList');
+    noticeList = (storedNotices && storedNotices !== 'null' && storedNotices !== '[]') ? JSON.parse(storedNotices) : DEFAULT_NOTICES;
+  } catch(e) { noticeList = DEFAULT_NOTICES; }
+  
+  try {
+    const storedTimelines = localStorage.getItem('timelines');
+    timelines = (storedTimelines && storedTimelines !== 'null' && storedTimelines !== '[]') ? JSON.parse(storedTimelines) : DEFAULT_TIMELINES;
+  } catch(e) { timelines = DEFAULT_TIMELINES; }
+  
+  try {
+    const storedBanners = localStorage.getItem('bannerList');
+    bannerList = (storedBanners && storedBanners !== 'null' && storedBanners !== '[]') ? JSON.parse(storedBanners) : DEFAULT_BANNERS;
+  } catch(e) { bannerList = DEFAULT_BANNERS; }
+  
+  try {
+    const storedEditLogs = localStorage.getItem('editLogs');
+    editLogs = (storedEditLogs && storedEditLogs !== 'null' && storedEditLogs !== '[]') ? JSON.parse(storedEditLogs) : [];
+  } catch(e) { editLogs = []; }
+  
+  // 如果奖项为空，初始化默认数据
+  if (awards.length === 0) {
+    awards = DEFAULT_AWARDS;
+    localStorage.setItem('awards', JSON.stringify(awards));
+  }
+}
+
+// 页面加载时初始化数据
+initData();
+
+let pendingFiles = [];
+let editingAwardId = null;
+let currentDetailId = null;
+let selectedTemplateAwardId = null;
+
+function saveData() { 
+  try {
+    localStorage.setItem('awards', JSON.stringify(awards)); 
+    localStorage.setItem('applications', JSON.stringify(applications)); 
+    localStorage.setItem('users', JSON.stringify(users));
+    localStorage.setItem('templates', JSON.stringify(templates));
+    localStorage.setItem('noticeList', JSON.stringify(noticeList));
+    localStorage.setItem('timelines', JSON.stringify(timelines));
+    localStorage.setItem('editLogs', JSON.stringify(editLogs));
+  } catch (e) {
+    console.error('saveData 错误:', e);
+    if (e.name === 'QuotaExceededError') {
+      showToast('❌ 存储空间不足！请清理旧数据', 'error');
+    }
+  }
+}
+function showToast(msg, type='success') { 
+  const t=document.getElementById('toast'); 
+  const emoji = type === 'success' ? '🎉' : '❌';
+  t.innerHTML = '<span class="emoji">' + emoji + '</span> ' + msg;
+  t.className='toast ' + type + ' active'; 
+  setTimeout(()=>t.classList.remove('active'),3000); 
+}
+function closeModal(id) { 
+  const modal = document.getElementById(id);
+  modal.classList.remove('active');
+  modal.classList.remove('large');
+}
+function showModal(id) { document.getElementById(id).classList.add('active'); }
+function formatDate(d) { const dt=new Date(d); return `${dt.getMonth()+1}月${dt.getDate()}日`; }
+function formatDateTime(d) { const dt=new Date(d); return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`; }
+function formatFileSize(bytes) { if(bytes < 1024) return bytes + ' B'; if(bytes < 1024 * 1024) return (bytes/1024).toFixed(1) + ' KB'; return (bytes/1024/1024).toFixed(1) + ' MB'; }
+
+// ==================== 导航 ====================
+function navigateTo(page) {
+  try {
+    if (page==='apply'&&!currentUser) { showModal('loginModal'); showToast('请先登录','error'); return; }
+    if (page==='admin'&&(!currentUser||currentUser.role!=='admin')) { showToast('无权限访问管理后台','error'); return; }
+    
+    // 更新导航标签状态
+    document.querySelectorAll('.nav-tab').forEach(function(t) {
+      t.classList.toggle('active', t.dataset.page === page);
+    });
+    
+    // 隐藏所有页面容器
+    document.querySelectorAll('.container').forEach(function(c) {
+      c.classList.remove('active');
+    });
+    
+    // 显示目标页面
+    var targetPage = document.getElementById('page-' + page);
+    if (targetPage) {
+      targetPage.classList.add('active');
+    }
+    
+    // 渲染对应页面内容
+    if(page==='home') { renderHomeBanner(); renderHomeStats(); renderHomeMyRecords(); renderAwards(); }
+    if(page==='apply') { renderMyRecords(); updateAwardSelect(); }
+    // news 页面已移除
+    if(page==='templates') renderTemplates();
+    if(page==='admin') initAdmin();
+  } catch(e) {
+    showToast('页面切换失败: ' + e.message, 'error');
+  }
+}
+
+// ==================== 登录系统 ====================
+function updateNavUser() {
+  const navUser=document.getElementById('navUser'),adminTab=document.getElementById('adminTab');
+  if(currentUser) {
+    adminTab.style.display=currentUser.role==='admin'?'flex':'none';
+    const initial = currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U';
+    navUser.innerHTML=`<div class="user-info"><div class="avatar">${initial}</div><div><div class="name">${currentUser.name}</div><div class="role">${currentUser.role==='admin'?'管理员':'申报人'}</div></div></div><button class="logout-btn" onclick="logout()">退出</button>`;
+  } else {
+    adminTab.style.display='none';
+    navUser.innerHTML=`<div class="nav-login-btn" onclick="showModal('loginModal')">👤 登录</div>`;
+  }
+}
+
+async function doLogin() {
+  const u=document.getElementById('loginUsername').value.trim();
+  const p=document.getElementById('loginPassword').value;
+  
+  if(!u){showToast('请输入用户名','error');return;}
+  if(!p){showToast('请输入密码','error');return;}
+  
+  // 优先使用后端认证
+  if (backendAvailable) {
+    try {
+      const res = await api.post('/auth/login', { username: u, password: p });
+      _authToken = res.data.token;
+      localStorage.setItem('authToken', _authToken);
+      currentUser = { id: res.data.user.id, name: res.data.user.username, role: res.data.user.role };
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      closeModal('loginModal');
+      updateNavUser();
+      showToast('登录成功');
+      // 登录后从后端同步数据
+      await syncDataFromBackend();
+      navigateTo('home');
+      return;
+    } catch(err) {
+      const msg = err.message || '登录失败';
+      if (msg.includes('不存在') || msg.includes('not found')) {
+        showToast('用户不存在，请先注册账号', 'error');
+        setTimeout(() => showRegisterModal(), 500);
+      } else {
+        showToast('❌ ' + msg, 'error');
+        document.getElementById('loginPassword').value = '';
+        document.getElementById('loginPassword').focus();
+      }
+      return;
+    }
+  }
+  
+  // 后端不可用时，降级到本地模式
+  users = JSON.parse(localStorage.getItem('users') || '[]');
+  if(u==='admin'&&p==='admin123') {
+    currentUser={id:'admin',name:'管理员',role:'admin'};
+    localStorage.setItem('currentUser',JSON.stringify(currentUser));
+    closeModal('loginModal');
+    updateNavUser();
+    showToast('登录成功（本地模式）');
+    navigateTo('home');
+    return;
+  }
+  let user = users.find(x => x.username === u);
+  if (user) {
+    if (!user.password) {
+      currentUser = { id: user.id, name: user.username, role: user.role };
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      closeModal('loginModal');
+      showModal('setPasswordModal');
+      return;
+    }
+    if (user.password !== p) {
+      showToast('密码不正确，请重新输入', 'error');
+      document.getElementById('loginPassword').value = '';
+      document.getElementById('loginPassword').focus();
+      return;
+    }
+    currentUser = { id: user.id, name: user.username, role: user.role };
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    closeModal('loginModal');
+    updateNavUser();
+    showToast('登录成功（本地模式）');
+    navigateTo('home');
+  } else {
+    showToast('用户不存在，请先注册账号', 'error');
+    setTimeout(() => showRegisterModal(), 500);
+  }
+}
+
+function savePassword() {
+  const p1 = document.getElementById('setPassword').value;
+  const p2 = document.getElementById('confirmPassword').value;
+  
+  if (!p1) {
+    showToast('请输入密码', 'error');
+    return;
+  }
+  if (p1 !== p2) {
+    showToast('两次密码输入不一致', 'error');
+    return;
+  }
+  
+  // 更新用户密码，标记为已修改（用户首次设置后就不能再自己修改了）
+  const userIndex = users.findIndex(x => x.id === currentUser.id);
+  if (userIndex !== -1) {
+    users[userIndex].password = p1;
+    users[userIndex].passwordChanged = true;
+    saveData();
+  }
+  
+  closeModal('setPasswordModal');
+  updateNavUser();
+  showToast('密码设置成功');
+}
+
+function logout() { 
+  currentUser=null;
+  _authToken=null;
+  localStorage.removeItem('currentUser');
+  localStorage.removeItem('authToken');
+  updateNavUser();
+  navigateTo('home');
+  showToast('已退出登录'); 
+}
+
+// 从后端同步所有数据到本地变量
+async function syncDataFromBackend() {
+  if (!backendAvailable) return;
+  try {
+    const [awardsRes, noticesRes, bannersRes] = await Promise.all([
+      api.get('/awards'),
+      api.get('/notices'),
+      api.get('/banners'),
+    ]);
+    
+    if (awardsRes.success) {
+      awards = awardsRes.data.map(a => ({
+        id: String(a.id),
+        name: a.name,
+        desc: a.description || '',
+        status: a.status === 'active' ? 'active' : (a.status === 'closed' ? 'closed' : 'pending'),
+        deadline: a.deadline ? a.deadline.substring(0,10) : '',
+        icon: a.icon || 'star',
+        rule: a.rule || '',
+        ruleImages: a.rule_images ? JSON.parse(a.rule_images) : [],
+        direction: '',
+        method: '',
+      }));
+      localStorage.setItem('awards', JSON.stringify(awards));
+    }
+    
+    if (noticesRes.success) {
+      noticeList = noticesRes.data.map(n => ({
+        id: n.id,
+        title: n.title,
+        content: n.content || '',
+        tag: n.type || 'notice',
+        date: n.created_at ? n.created_at.substring(0,10) : new Date().toISOString().substring(0,10),
+      }));
+      localStorage.setItem('noticeList', JSON.stringify(noticeList));
+    }
+    
+    if (bannersRes.success) {
+      bannerList = bannersRes.data.map(b => ({
+        id: b.id,
+        tag: b.tag || '申报已开启',
+        title: b.title,
+        desc: b.description || '',
+        linkType: b.link || 'apply',
+        active: b.status === 'active',
+      }));
+      localStorage.setItem('bannerList', JSON.stringify(bannerList));
+    }
+    
+    // 如果已登录，同步申报数据
+    if (currentUser && _authToken) {
+      const appsRes = await api.get('/applications');
+      if (appsRes.success) {
+        applications = appsRes.data.map(a => ({
+          id: a.id,
+          awardId: String(a.award_id),
+          awardName: a.award_name || '',
+          userId: a.user_id,
+          userName: a.username || '',
+          contactName: a.contact_name || '',
+          title: a.project_name || '',
+          sortOrder: a.sort_order || 0,
+          status: a.status || 'pending',
+          reviewComment: a.review_comment || '',
+          files: a.attachments ? JSON.parse(a.attachments) : [],
+          createdAt: a.created_at || new Date().toISOString(),
+          deleted: a.deleted === 1,
+        }));
+        localStorage.setItem('applications', JSON.stringify(applications));
+      }
+    }
+  } catch(e) {
+    console.warn('[syncDataFromBackend] 同步失败:', e.message);
+  }
+}
+
+// ==================== 用户注册 ====================
+function showRegisterModal() {
+  closeModal('loginModal');
+  document.getElementById('regUsername').value = '';
+  document.getElementById('regPassword').value = '';
+  document.getElementById('regPassword2').value = '';
+  showModal('registerModal');
+}
+
+async function doRegister() {
+  const username = document.getElementById('regUsername').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const password2 = document.getElementById('regPassword2').value;
+  
+  if (!username) { showToast('请输入用户名', 'error'); return; }
+  if (username.length < 2) { showToast('用户名至少2个字符', 'error'); return; }
+  if (username === 'admin') { showToast('该用户名不可用', 'error'); return; }
+  if (!password) { showToast('请输入密码', 'error'); return; }
+  if (password !== password2) { showToast('两次密码输入不一致', 'error'); return; }
+  
+  // 优先使用后端注册
+  if (backendAvailable) {
+    try {
+      const res = await api.post('/auth/register', { username, password });
+      _authToken = res.data.token;
+      localStorage.setItem('authToken', _authToken);
+      currentUser = { id: res.data.user.id, name: res.data.user.username, role: res.data.user.role };
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      closeModal('registerModal');
+      updateNavUser();
+      showToast('注册成功，欢迎 ' + username + '！');
+      await syncDataFromBackend();
+      navigateTo('home');
+      return;
+    } catch(err) {
+      showToast('❌ ' + (err.message || '注册失败'), 'error');
+      return;
+    }
+  }
+  
+  // 降级到本地模式
+  users = JSON.parse(localStorage.getItem('users') || '[]');
+  if (users.find(u => u.username === username)) { showToast('该用户名已被注册', 'error'); return; }
+  const newUser = { id: 'user_' + Date.now(), username, password, role: 'user', createdAt: new Date().toISOString() };
+  users.push(newUser);
+  saveData();
+  closeModal('registerModal');
+  currentUser = { id: newUser.id, name: newUser.username, role: newUser.role };
+  localStorage.setItem('currentUser', JSON.stringify(currentUser));
+  updateNavUser();
+  showToast('注册成功，欢迎 ' + username + '！');
+  navigateTo('home');
+}
+
+// ==================== 首页 ====================
+const iconEmoji={star:'⭐',trophy:'🏆',shield:'🛡️',leaf:'🌿',book:'📖'};
+const timelineIconMap={shield:'🛡️',star:'⭐',globe:'🌐',trophy:'🏆',leaf:'🌿',book:'📖'};
+
+function renderHomeTimeline() {
+  // 重新加载最新时间轴数据
+  timelines = JSON.parse(localStorage.getItem('timelines')) || timelines;
+  
+  const colorMap = {active: 'yellow', urgent: 'red', inactive: 'gray'};
+  const statusMap = {active: 'active', urgent: 'urgent', inactive: 'inactive'};
+  
+  document.getElementById('homeTimeline').innerHTML = timelines.map(t => {
+    const icon = timelineIconMap[t.icon] || '⭐';
+    const statusClass = statusMap[t.status] || 'inactive';
+    const dotColor = colorMap[t.status] || 'gray';
+    return '<div class="timeline-item ' + statusClass + '" onclick="goToApply(\'' + (t.awardId || '') + '\')">' +
+      '<div class="timeline-header">' +
+        '<div class="timeline-header-left">' + icon + ' ' + t.time + '</div>' +
+        '<div class="timeline-dot ' + dotColor + '"></div>' +
+      '</div>' +
+      '<p class="timeline-desc">' + t.title + '</p>' +
+    '</div>';
+  }).join('');
+}
+
+// 渲染首页申报进度统计
+function renderHomeStats() {
+  const statsEl = document.getElementById('homeStats');
+  if (!currentUser) {
+    statsEl.style.display = 'none';
+    return;
+  }
+  
+  // 重新加载数据
+  applications = JSON.parse(localStorage.getItem('applications')) || applications;
+  awards = JSON.parse(localStorage.getItem('awards')) || awards;
+  
+  // 管理员视角：显示所有申报统计
+  if (currentUser.role === 'admin') {
+    const allApps = applications.filter(a => !a.deleted);
+    const total = allApps.length;
+    const pending = allApps.filter(a => a.status === 'pending').length;
+    const approved = allApps.filter(a => a.status === 'approved').length;
+    const rejected = allApps.filter(a => a.status === 'rejected').length;
+    
+    if (total === 0) {
+      statsEl.style.display = 'none';
+      return;
+    }
+    
+    statsEl.style.display = 'block';
+    statsEl.innerHTML = '<div class="mini-stats">' +
+      '<div class="mini-stats-body">' +
+        '<div class="mini-stats-row">' +
+          '<div class="mini-stat pending"><span class="mini-stat-num">' + pending + '</span><span class="mini-stat-label">待审</span></div>' +
+          '<div class="mini-stat approved"><span class="mini-stat-num">' + approved + '</span><span class="mini-stat-label">通过</span></div>' +
+          '<div class="mini-stat rejected"><span class="mini-stat-num">' + rejected + '</span><span class="mini-stat-label">驳回</span></div>' +
+          '<div class="mini-stat total"><span class="mini-stat-num">' + total + '</span><span class="mini-stat-label">总计</span></div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+    return;
+  }
+  
+  // 用户视角
+  const myApps = applications.filter(a => a.userId === currentUser.id && !a.deleted);
+  
+  if (myApps.length === 0) {
+    statsEl.style.display = 'none';
+    return;
+  }
+  
+  const total = myApps.length;
+  const pending = myApps.filter(a => a.status === 'pending').length;
+  const approved = myApps.filter(a => a.status === 'approved').length;
+  const rejected = myApps.filter(a => a.status === 'rejected').length;
+  
+  statsEl.style.display = 'block';
+  statsEl.innerHTML = '<div class="mini-stats">' +
+    '<div class="mini-stats-body">' +
+      '<div class="mini-stats-row">' +
+        '<div class="mini-stat pending"><span class="mini-stat-num">' + pending + '</span><span class="mini-stat-label">待审</span></div>' +
+        '<div class="mini-stat approved"><span class="mini-stat-num">' + approved + '</span><span class="mini-stat-label">通过</span></div>' +
+        '<div class="mini-stat rejected"><span class="mini-stat-num">' + rejected + '</span><span class="mini-stat-label">驳回</span></div>' +
+        '<div class="mini-stat total"><span class="mini-stat-num">' + total + '</span><span class="mini-stat-label">总计</span></div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+// 首页渲染个人申报记录
+function renderHomeMyRecords() {
+  const container = document.getElementById('homeMyRecords');
+  if (!currentUser || currentUser.role === 'admin') {
+    container.innerHTML = '';
+    return;
+  }
+  
+  // 重新加载最新申报数据
+  applications = JSON.parse(localStorage.getItem('applications')) || applications;
+  const myApps = applications.filter(a => a.userId === currentUser.id && !a.deleted);
+  
+  if (myApps.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+  
+  const recentApps = myApps.slice(-3); // 只显示最近3条
+  const statusMap = {pending: '待审核', approved: '已通过', rejected: '已驳回'};
+  const safeStatus = (s) => statusMap[s] ? s : 'pending';
+  const statusClass = {pending: 'pending', approved: 'approved', rejected: 'rejected'};
+  
+  let html = '<div style="margin-top:24px;padding-top:20px;border-top:1px solid #E8E4DF;">' +
+    '<div class="sidebar-title">📋 我的申报</div>';
+  
+  recentApps.forEach(a => {
+    const st = safeStatus(a.status);
+    const statusStyle = {
+      pending: 'background:linear-gradient(135deg,#F0F2F3,#E8E4DE);color:#7A6B5A;border:1px solid #D8DDD0;',
+      approved: 'background:linear-gradient(135deg,#E8F4EA,#D4EDDA);color:#27AE60;border:1px solid #A8D8B9;',
+      rejected: 'background:linear-gradient(135deg,#FFEAEA,#FFE0E0);color:#D63031;border:1px solid #FFBABA;'
+    };
+    const dotStyle = {
+      pending: 'background:#D4A574;',
+      approved: 'background:#27AE60;',
+      rejected: 'background:#D63031;'
+    };
+    const fileCount = a.files && a.files.length > 0 ? a.files.length : 0;
+    html += '<div class="timeline-item" style="padding:12px;cursor:pointer;" onclick="showApplicationDetail(' + a.id + ')">' +
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">' +
+        '<span style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:' + dotStyle[st].replace('background:', '') + '"></span>' +
+        '<span style="font-size:12px;font-weight:600;color:#2D2D2D;flex:1;">' + a.awardName + '</span>' +
+        '<span style="' + statusStyle[st] + 'padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600;white-space:nowrap;">' + statusMap[st] + '</span>' +
+      '</div>' +
+      '<div style="font-size:12px;color:#5A5A5A;margin-bottom:4px;">📝 ' + a.title + '</div>' +
+      '<div style="display:flex;justify-content:space-between;font-size:11px;color:#8A8A8A;">' +
+        '<span>👤 ' + a.userName + '</span>' +
+        '<span>📎 ' + fileCount + '个附件</span>' +
+      '</div>' +
+    '</div>';
+  });
+  
+  html += '<div class="section-more" style="margin-top:8px;justify-content:center;" onclick="navigateTo(\'apply\')">查看全部 ›</div>';
+  html += '</div>';
+  container.innerHTML = html;
+}
+// 判断奖项紧急程度（考虑时间）
+function getAwardUrgency(award) {
+  if (award.status !== 'active') {
+    return award.status === 'pending' ? 2 : 3; // 未开始=2, 已结束=3
+  }
+  
+  // 进行中的奖项，检查截止时间
+  if (award.deadline) {
+    const now = new Date();
+    const deadline = new Date(award.deadline);
+    const daysLeft = Math.ceil((deadline - now) / (1000 * 60 * 60 * 24));
+    
+    if (daysLeft <= 1) return 0;  // 紧急：剩余1天或已过期
+    if (daysLeft <= 3) return 0;  // 紧急：剩余3天内
+    if (award.id === 'tech') return 0;  // tech奖项固定紧急
+  }
+  
+  return award.id === 'tech' ? 0 : 1;  // tech=紧急(0), 其他进行中=1
+}
+
+// 渲染首页横幅
+function renderHomeBanner() {
+  const activeBanner = bannerList.find(b => b.active);
+  const wrapper = document.getElementById('homeBannerWrapper');
+  const banner = document.getElementById('homeBanner');
+  if (!activeBanner) {
+    if (wrapper) wrapper.style.display = 'none';
+    return;
+  }
+  if (wrapper) wrapper.style.display = 'block';
+  if (banner) banner.style.display = 'flex';
+  document.getElementById('bannerTag').textContent = activeBanner.tag;
+  document.getElementById('bannerTitle').textContent = activeBanner.title;
+  document.getElementById('bannerDesc').textContent = activeBanner.desc;
+  document.getElementById('bannerBtn').onclick = function() {
+    if (activeBanner.linkType === 'apply') navigateTo('apply');
+    else if (activeBanner.linkType === 'award' && activeBanner.linkId) showAwardDetail(activeBanner.linkId);
+  };
+}
+
+function renderAwards() {
+  // 数据已在initData()中加载，此处不再重复加载
+  
+  // 按紧急程度排序：紧急(0) > 进行中(1) > 未开始(2) > 已结束(3)
+  const sortedAwards = [...awards].sort((a, b) => {
+    return getAwardUrgency(a) - getAwardUrgency(b);
+  });
+  
+  const grid=document.getElementById('awardsGrid');
+  grid.innerHTML=sortedAwards.map(a=>{
+    const urgency = getAwardUrgency(a);
+    const sc = urgency === 0 ? 'urgent' : a.status === 'pending' ? 'active' : a.status === 'active' ? 'warnings' : 'inactive';
+    const st = urgency === 0 ? '紧急' : a.status === 'active' ? '进行中' : a.status === 'pending' ? '未开始' : '已结束';
+    const tc = urgency === 0 ? 'urgent' : a.status === 'active' ? 'warnings' : '';
+    const tt = a.deadline ? (a.status === 'active' ? '截止：' + formatDate(a.deadline) : '申报：' + formatDate(a.deadline)) : '';
+    const bc = urgency === 0 ? 'primary' : a.status === 'active' ? 'warning' : 'secondary';
+    const bt = '查看详情';
+    const icon = iconEmoji[a.icon] || '⭐';
+    // 根据图标类型设置卡片底部渐变条颜色
+    const accentMap = {
+      star:   '--card-accent:#E8C87A;--card-accent2:#E8D5B7;',
+      trophy: '--card-accent:#A8D5BA;--card-accent2:#90C8A8;',
+      shield: '--card-accent:#B8B8D1;--card-accent2:#9BA3C8;',
+      leaf:   '--card-accent:#A8D5BA;--card-accent2:#D4A5A5;',
+      book:   '--card-accent:#D4A5A5;--card-accent2:#E8C4A0;'
+    };
+    const cardStyle = (accentMap[a.icon] || '--card-accent:#A8D5BA;--card-accent2:#B8B8D1;') + 'cursor:pointer;';
+    
+    return '<div class="award-card" style="' + cardStyle + '" onclick="showAwardDetail(\'' + a.id + '\')">' +
+      '<div class="award-header">' +
+        '<div class="award-icon ' + a.icon + '">' + icon + '</div>' +
+        '<div class="award-status ' + sc + '"><span class="dot"></span>' + st + '</div>' +
+      '</div>' +
+      '<div class="award-name">' + a.name + '</div>' +
+      '<div class="award-desc">' + a.desc + '</div>' +
+      '<div class="award-time ' + tc + '">🕐 ' + tt + '</div>' +
+      '<div class="award-btn ' + bc + '" onclick="event.stopPropagation();showAwardDetail(\'' + a.id + '\')">' + bt + ' →</div>' +
+    '</div>';
+  }).join('') + '<div class="award-card more-card"><div class="icon">➕</div><div class="title">更多奖项</div><div class="sub">敬请期待</div></div>';
+  
+  // 渲染时间轴
+  renderHomeTimeline();
+  
+  // 渲染首页个人申报记录
+  renderHomeMyRecords();
+  
+  // 渲染首页公告列表
+  renderHomeNews();
+}
+
+// 渲染首页公告列表
+function renderHomeNews() {
+  const container = document.getElementById('homeNewsList');
+  if (!container) return;
+  
+  // 重新加载最新数据
+  noticeList = JSON.parse(localStorage.getItem('noticeList')) || noticeList;
+  
+  if (noticeList.length === 0) {
+    container.innerHTML = '<div class="empty-state">暂无公告</div>';
+    return;
+  }
+  
+  const tagMap = {notice: '通知', update: '更新', info: '资讯'};
+  const tagCls = {notice: 'notice', update: 'update', info: 'info'};
+  
+  // 只显示最近5条
+  const recentNotices = noticeList.slice(0, 5);
+  
+  container.innerHTML = recentNotices.map(n => {
+    const tag = tagMap[n.tag] || '资讯';
+    const cls = tagCls[n.tag] || 'info';
+    const date = formatDate(n.date);
+    return '<div class="news-card" onclick="showNoticeDetail(' + n.id + ')">' +
+      '<div class="news-tag ' + cls + '">' + tag + '</div>' +
+      '<div class="news-title">' + n.title + '</div>' +
+      '<div class="news-meta"><span>' + date + '</span></div>' +
+    '</div>';
+  }).join('');
+}
+
+// 显示公告详情
+function showNoticeDetail(noticeId) {
+  const notice = noticeList.find(n => n.id === noticeId);
+  if (!notice) return;
+  
+  const tagMap = {notice: '通知', update: '更新', info: '资讯'};
+  const content = '<div style="padding:8px;">' +
+    '<div style="margin-bottom:16px;"><span style="background:#E0E4E6;color:#5C6B73;padding:4px 12px;border-radius:4px;font-size:12px;">' + (tagMap[notice.tag] || '资讯') + '</span></div>' +
+    '<div style="font-size:18px;font-weight:600;color:#2D2D2D;margin-bottom:12px;">' + notice.title + '</div>' +
+    '<div style="font-size:13px;color:#8A8A8A;margin-bottom:16px;">' + formatDate(notice.date) + '</div>' +
+    '<div style="font-size:14px;color:#5A5A5A;line-height:1.8;white-space:pre-wrap;">' + notice.content + '</div>' +
+  '</div>';
+  
+  document.getElementById('noticeDetailTitle').textContent = notice.title;
+  document.getElementById('noticeDetailContent').innerHTML = content;
+  showModal('noticeDetailModal');
+}
+function updateAwardSelect() { 
+  document.getElementById('selectAward').innerHTML='<option value="">请选择申报奖项</option>'+awards.filter(a=>a.status==='active').map(a=>'<option value="'+a.id+'">'+a.name+'</option>').join(''); 
+}
+function goToApply(id) { 
+  // 统一跳转到奖项详情弹窗
+  if (id) {
+    showAwardDetail(id);
+  } else {
+    navigateTo('apply');
+  }
+}
+
+// ==================== 激励速递 ====================
+function renderNews() {
+  // 数据已在initData()中加载，此处不再重复加载
+  
+  const tagMap={notice:'通知',update:'更新',info:'资讯'},tagCls={notice:'notice',update:'update',info:'info'};
+  
+  // 构建奖项卡片HTML（按紧急程度排序）
+  let awardsHtml = '<div style="margin-bottom:32px;"><div style="font-size:18px;font-weight:500;color:#2D2D2D;margin-bottom:16px;">🏅 奖项激励规则</div><div class="awards-grid">';
+  
+  // 按紧急程度排序
+  const sortedAwards = [...awards].sort((a, b) => {
+    return getAwardUrgency(a) - getAwardUrgency(b);
+  });
+  
+  sortedAwards.forEach(a => {
+    const urgency = getAwardUrgency(a);
+    const sc = urgency === 0 ? 'urgent' : a.status === 'pending' ? 'active' : a.status === 'active' ? 'warnings' : 'inactive';
+    const st = urgency === 0 ? '紧急' : a.status === 'active' ? '进行中' : a.status === 'pending' ? '未开始' : '已结束';
+    const icon = iconEmoji[a.icon] || '⭐';
+    const hasRule = a.ruleImage ? '📷' : '';
+    // 统一调用showAwardDetail展示完整详情
+    const ruleBtn = '<button class="btn btn-primary" style="height:32px;font-size:12px;margin-top:8px;" onclick="event.stopPropagation();showAwardDetail(\'' + a.id + '\')">' + (a.ruleImage ? '查看详情' : '查看详情') + '</button>';
+    
+    awardsHtml += '<div class="award-card" onclick="showAwardDetail(\'' + a.id + '\')">' +
+      '<div class="award-header">' +
+        '<div class="award-icon ' + a.icon + '">' + icon + '</div>' +
+        '<div class="award-status ' + sc + '"><span class="dot"></span>' + st + '</div>' +
+      '</div>' +
+      '<div class="award-name">' + a.name + ' ' + hasRule + '</div>' +
+      '<div class="award-desc">' + a.desc + '</div>' +
+      '<div style="font-size:12px;color:#5C6B73;margin-bottom:8px;">激励导向：' + a.direction + '</div>' +
+      ruleBtn +
+    '</div>';
+  });
+  
+  awardsHtml += '</div></div>';
+  
+  // 构建公告列表HTML
+  let noticesHtml = '<div><div style="font-size:18px;font-weight:500;color:#2D2D2D;margin-bottom:16px;">📢 最新公告</div>';
+  
+  if (noticeList.length === 0) {
+    noticesHtml += '<div class="empty-state">暂无公告</div>';
+  } else {
+    noticeList.forEach(n => {
+      const tagName = tagMap[n.type] || '资讯';
+      const tagClass = tagCls[n.type] || 'info';
+      noticesHtml += '<div class="news-item">' +
+        '<div class="news-meta">' +
+          '<span class="news-tag ' + tagClass + '">' + tagName + '</span>' +
+          '<span class="news-date">' + n.date + '</span>' +
+        '</div>' +
+        '<div class="news-title">' + n.title + '</div>' +
+        '<div class="news-summary">' + n.content + '</div>' +
+      '</div>';
+    });
+  }
+  
+  noticesHtml += '</div>';
+  
+  document.getElementById('homeNewsList').innerHTML = awardsHtml + noticesHtml;
+}
+
+// 显示奖项激励规则
+function showAwardRule(awardId) {
+  const award = awards.find(a => a.id === awardId);
+  if (!award) return;
+  
+  document.getElementById('awardRuleTitle').textContent = award.name + ' - 激励规则';
+  
+  if (award.ruleImage) {
+    document.getElementById('awardRuleContent').innerHTML = 
+      '<div style="text-align:center;">' +
+        '<img src="' + award.ruleImage + '" style="max-width:100%;border-radius:8px;" alt="激励规则">' +
+      '</div>';
+  } else {
+    document.getElementById('awardRuleContent').innerHTML = 
+      '<div class="detail-section">' +
+        '<div class="detail-label">激励导向</div>' +
+        '<div class="detail-value">' + (award.direction || '暂无') + '</div>' +
+      '</div>' +
+      '<div class="detail-section">' +
+        '<div class="detail-label">评选方式</div>' +
+        '<div class="detail-value">' + (award.method || '暂无') + '</div>' +
+      '</div>' +
+      '<div class="detail-section">' +
+        '<div class="detail-label">申报截止时间</div>' +
+        '<div class="detail-value">' + (award.deadline ? formatDate(award.deadline) : '未设置') + '</div>' +
+      '</div>' +
+      '<div class="detail-section">' +
+        '<div class="detail-label">详细说明</div>' +
+        '<div class="detail-value">' + (award.desc || '暂无') + '</div>' +
+      '</div>';
+  }
+  
+  showModal('awardRuleModal');
+}
+
+// 显示申报详情弹窗（用于首页申报记录点击）
+function showApplicationDetail(appId) {
+  const app = applications.find(a => a.id === appId);
+  if (!app) return;
+  
+  const statusMap = {pending: '待审核', approved: '已通过', rejected: '已驳回'};
+  const safeStatus = (s) => statusMap[s] ? s : 'pending';
+  const statusStyle = {
+    pending: 'background:linear-gradient(135deg,#F0F2F3,#E8E4DE);color:#7A6B5A;border:1px solid #D8DDD0;padding:6px 16px;border-radius:16px;',
+    approved: 'background:linear-gradient(135deg,#E8F4EA,#D4EDDA);color:#27AE60;border:1px solid #A8D8B9;padding:6px 16px;border-radius:16px;',
+    rejected: 'background:linear-gradient(135deg,#FFEAEA,#FFE0E0);color:#D63031;border:1px solid #FFBABA;padding:6px 16px;border-radius:16px;'
+  };
+  
+  let contentHtml = '';
+  const st = safeStatus(app.status);
+  
+  // 申报信息
+  contentHtml += '<div style="margin-bottom:16px;"><div style="font-size:14px;color:#8A8A8A;margin-bottom:4px;">奖项名称</div><div style="font-size:16px;font-weight:600;color:#2D2D2D;">' + app.awardName + '</div></div>';
+  contentHtml += '<div style="margin-bottom:16px;"><div style="font-size:14px;color:#8A8A8A;margin-bottom:4px;">申报项目</div><div style="font-size:16px;font-weight:600;color:#2D2D2D;">' + app.title + '</div></div>';
+  contentHtml += '<div style="margin-bottom:16px;"><div style="font-size:14px;color:#8A8A8A;margin-bottom:4px;">接口人</div><div style="font-size:14px;color:#2D2D2D;">' + app.userName + '</div></div>';
+  contentHtml += '<div style="margin-bottom:16px;"><div style="font-size:14px;color:#8A8A8A;margin-bottom:8px;">审核状态</div><span style="' + statusStyle[st] + 'font-size:14px;font-weight:600;">' + statusMap[st] + '</span></div>';
+  
+  // 如果被驳回，显示驳回原因
+  if (app.status === 'rejected' && app.rejectReason) {
+    contentHtml += '<div style="margin-bottom:16px;padding:12px 16px;background:#FFF5F5;border:1px solid #FFBABA;border-radius:12px;"><div style="font-size:13px;color:#D63031;font-weight:600;margin-bottom:4px;">❌ 驳回原因</div><div style="font-size:14px;color:#2D2D2D;line-height:1.5;">' + app.rejectReason + '</div></div>';
+  }
+  
+  contentHtml += '<div style="margin-bottom:16px;"><div style="font-size:14px;color:#8A8A8A;margin-bottom:4px;">提交时间</div><div style="font-size:14px;color:#2D2D2D;">' + formatDateTime(app.submitTime) + '</div></div>';
+  
+  // 附件列表
+  if (app.files && app.files.length > 0) {
+    contentHtml += '<div style="margin-top:20px;"><div style="font-size:14px;color:#8A8A8A;margin-bottom:8px;">已上传附件 (' + app.files.length + '个)</div>';
+    contentHtml += '<div style="background:#F9F9F9;border-radius:8px;padding:12px;">';
+    app.files.forEach((f, i) => {
+      contentHtml += '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #E8E4DF;' + (i === app.files.length - 1 ? 'border-bottom:none;' : '') + '">' +
+        '<span style="font-size:18px;">📎</span>' +
+        '<span style="flex:1;font-size:13px;color:#2D2D2D;">' + f.name + '</span>' +
+        '<span style="font-size:11px;color:#8A8A8A;">' + formatFileSize(f.size) + '</span>' +
+      '</div>';
+    });
+    contentHtml += '</div></div>';
+  }
+  
+  // 操作按钮
+  contentHtml += '<div style="margin-top:24px;text-align:center;border-top:1px solid #E8E4DF;padding-top:20px;">' +
+    '<button class="btn btn-warning" style="height:44px;font-size:16px;padding:0 32px;margin-right:12px;" onclick="closeModal(\'awardRuleModal\');editApplication(' + app.id + ');">✏️ 修改申报</button>' +
+    '<button class="btn btn-danger" style="height:44px;font-size:16px;padding:0 32px;background:#FF6B6B;" onclick="if(confirm(\'确定要删除这条申报记录吗？\')){closeModal(\'awardRuleModal\');deleteMyApplication(' + app.id + ');}">🗑 删除</button>' +
+  '</div>';
+  
+  document.getElementById('awardRuleTitle').textContent = '📋 申报详情';
+  document.getElementById('awardRuleContent').innerHTML = contentHtml;
+  
+  // 使用大尺寸弹窗
+  const modal = document.getElementById('awardRuleModal');
+  modal.classList.add('large');
+  
+  showModal('awardRuleModal');
+}
+
+// 图片预览弹窗
+function showImagePreview(imgSrc) {
+  document.getElementById('imagePreviewImg').src = imgSrc;
+  showModal('imagePreviewModal');
+}
+
+// 统一显示奖项详情（描述+激励规则一起展示）
+function showAwardDetail(awardId) {
+  const award = awards.find(a => a.id === awardId);
+  if (!award) return;
+  
+  const urgency = getAwardUrgency(award);
+  const statusText = urgency === 0 ? '紧急' : award.status === 'active' ? '进行中' : award.status === 'pending' ? '未开始' : '已结束';
+  
+  let contentHtml = '';
+  
+  // 基本信息
+  contentHtml += '<div style="margin-bottom:16px;"><div style="font-size:14px;color:#8A8A8A;margin-bottom:4px;">奖项名称</div><div style="font-size:16px;font-weight:600;color:#2D2D2D;">' + award.name + '</div></div>';
+  contentHtml += '<div style="margin-bottom:16px;"><div style="font-size:14px;color:#8A8A8A;margin-bottom:4px;">当前状态</div><div style="font-size:14px;color:#5C6B73;font-weight:500;">' + statusText + '</div></div>';
+  
+  if (award.direction) {
+    contentHtml += '<div style="margin-bottom:16px;"><div style="font-size:14px;color:#8A8A8A;margin-bottom:4px;">激励导向</div><div style="font-size:14px;color:#2D2D2D;">' + award.direction + '</div></div>';
+  }
+  if (award.method) {
+    contentHtml += '<div style="margin-bottom:16px;"><div style="font-size:14px;color:#8A8A8A;margin-bottom:4px;">评选方式</div><div style="font-size:14px;color:#2D2D2D;">' + award.method + '</div></div>';
+  }
+  if (award.deadline) {
+    contentHtml += '<div style="margin-bottom:16px;"><div style="font-size:14px;color:#8A8A8A;margin-bottom:4px;">申报截止时间</div><div style="font-size:14px;color:#2D2D2D;">' + formatDate(award.deadline) + '</div></div>';
+  }
+  if (award.desc) {
+    contentHtml += '<div style="margin-bottom:16px;"><div style="font-size:14px;color:#8A8A8A;margin-bottom:4px;">奖项说明</div><div style="font-size:14px;color:#2D2D2D;white-space:pre-wrap;line-height:1.6;">' + award.desc + '</div></div>';
+  }
+  
+  // 激励规则图片（支持多张，可点击放大）
+  if (award.ruleImages && award.ruleImages.length > 0) {
+    const imgHtml = award.ruleImages.map((img, idx) => 
+      '<img src="' + img + '" style="max-width:48%;max-height:300px;border-radius:4px;margin:4px;cursor:pointer;" onclick="showImagePreview(\'' + img.replace(/'/g, "\\'") + '\')" alt="激励规则' + (idx + 1) + '" title="点击放大查看">'
+    ).join('');
+    contentHtml += '<div style="margin-top:16px;"><div style="font-size:14px;color:#8A8A8A;margin-bottom:8px;">激励规则（点击图片可放大）</div><div style="background:#F9F9F9;border-radius:8px;padding:16px;display:flex;flex-wrap:wrap;justify-content:center;">' + imgHtml + '</div></div>';
+  }
+  
+  // 检查用户是否已申报过该奖项
+  const existingApp = currentUser ? applications.find(a => a.userId === currentUser.id && a.awardId === awardId) : null;
+  
+  // 申报按钮
+  if (award.status === 'active') {
+    if (currentUser) {
+      if (existingApp) {
+        // 已申报过，显示修改按钮
+        contentHtml += '<div style="margin-top:24px;text-align:center;border-top:1px solid #E8E4DF;padding-top:20px;">' +
+          '<div style="color:#5C6B73;font-size:14px;margin-bottom:12px;">✓ 您已申报过此奖项</div>' +
+          '<button class="btn btn-warning" style="height:44px;font-size:16px;padding:0 48px;" onclick="closeModal(\'awardRuleModal\');editApplication(' + existingApp.id + ');">✏️ 修改申报 →</button>' +
+        '</div>';
+      } else {
+        // 未申报，显示申报按钮
+        contentHtml += '<div style="margin-top:24px;text-align:center;border-top:1px solid #E8E4DF;padding-top:20px;">' +
+          '<button class="btn btn-primary" style="height:44px;font-size:16px;padding:0 48px;" onclick="closeModal(\'awardRuleModal\');navigateTo(\'apply\');document.getElementById(\'selectAward\').value=\'' + awardId + '\';">立即申报 →</button>' +
+        '</div>';
+      }
+    } else {
+      contentHtml += '<div style="margin-top:24px;text-align:center;border-top:1px solid #E8E4DF;padding-top:20px;">' +
+        '<button class="btn btn-warning" style="height:44px;font-size:16px;padding:0 48px;" onclick="closeModal(\'awardRuleModal\');showModal(\'loginModal\');showToast(\'请先登录后再申报\',\'error\');">请先登录 →</button>' +
+      '</div>';
+    }
+  }
+  
+  document.getElementById('awardRuleTitle').textContent = '📋 ' + award.name + ' - 奖项详情';
+  document.getElementById('awardRuleContent').innerHTML = contentHtml;
+  
+  // 使用大尺寸弹窗
+  const modal = document.getElementById('awardRuleModal');
+  modal.classList.add('large');
+  
+  showModal('awardRuleModal');
+}
+
+// ==================== 下载模版 ====================
+function renderTemplates() {
+  const extIcon={xlsx:'📊',docx:'📝',pdf:'📄'};
+  document.getElementById('templateGrid').innerHTML=templates.filter(t => t.type === 'award').map(t=>`<div class="template-card"><div class="template-icon">${extIcon[t.file.split('.').pop()]||'📄'}</div><div class="template-info"><div class="template-name">${t.name}</div><div class="template-desc">${t.desc}</div><div class="template-download" onclick="downloadTemplate(${t.id})">📥 下载模版</div></div></div>`).join('');
+}
+function downloadTemplate(id) { 
+  const t = templates.find(x => x.id === id);
+  if (!t) return;
+  
+  if (t.dataUrl) {
+    // 直接使用dataUrl下载
+    const a = document.createElement('a');
+    a.href = t.dataUrl;
+    a.download = t.file || '模板文件';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    showToast('开始下载: ' + (t.name || t.file), 'success');
+  } else {
+    showToast('❌ 模板文件不存在', 'error');
+  }
+}
+
+// ==================== 提交申报 ====================
+function initUpload() {
+  const ua=document.getElementById('uploadArea'),fi=document.getElementById('fileInput');
+  ua.addEventListener('click',()=>fi.click());
+  ua.addEventListener('dragover',e=>{e.preventDefault();ua.classList.add('dragover');});
+  ua.addEventListener('dragleave',()=>ua.classList.remove('dragover'));
+  ua.addEventListener('drop',e=>{e.preventDefault();ua.classList.remove('dragover');handleFiles(e.dataTransfer.files);});
+  fi.addEventListener('change',e=>handleFiles(e.target.files));
+}
+
+function checkAwardTemplate(awardId) {
+  const info = document.getElementById('awardTemplateInfo');
+  const nameEl = document.getElementById('templateFileName');
+  const awardTemplates = templates.filter(t => t.awardId === awardId && t.type === 'award');
+  
+  if (awardTemplates.length > 0) {
+    info.style.display = 'block';
+    nameEl.textContent = awardTemplates[0].name + ' (' + awardTemplates[0].file + ')';
+    selectedTemplateAwardId = awardId;
+  } else {
+    info.style.display = 'none';
+    selectedTemplateAwardId = null;
+  }
+}
+
+function downloadAwardTemplate() {
+  if (!selectedTemplateAwardId) return;
+  const awardTemplates = templates.filter(t => t.awardId === selectedTemplateAwardId && t.type === 'award');
+  if (awardTemplates.length > 0) {
+    downloadTemplate(awardTemplates[0].id);
+  } else {
+    showToast('该奖项暂无申报表模板', 'error');
+  }
+}
+
+// 显示模板选择弹窗（支持多模板选择）
+function showTemplateSelectModal() {
+  awards = JSON.parse(localStorage.getItem('awards')) || awards;
+  templates = JSON.parse(localStorage.getItem('templates')) || templates;
+  
+  const selectedId = document.getElementById('selectAward').value;
+  if (!selectedId) {
+    showToast('请先选择申报奖项', 'error');
+    return;
+  }
+  
+  const award = awards.find(a => a.id === selectedId);
+  if (!award) return;
+  
+  const awardTemplates = templates.filter(t => t.awardId === selectedId && t.type === 'award');
+  
+  const extIcon = {xlsx: '📊', xls: '📊', docx: '📝', doc: '📝', pdf: '📄'};
+  const list = document.getElementById('templateSelectList');
+  
+  if (awardTemplates.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:32px;color:#8A8A8A;">该奖项暂无申报表模板</div>';
+  } else if (awardTemplates.length === 1) {
+    // 只有一个模板，直接下载
+    downloadTemplateById(awardTemplates[0].id);
+    closeModal('templateSelectModal');
+  } else {
+    // 多个模板，显示选择列表
+    list.innerHTML = '<div style="margin-bottom:16px;color:#5A5A5A;font-size:14px;">' + award.name + ' 共有 ' + awardTemplates.length + ' 个申报表模板，请选择：</div>' +
+      awardTemplates.map(t => {
+        const ext = t.file.split('.').pop();
+        return '<div style="display:flex;align-items:center;justify-content:space-between;padding:16px;background:#FAF8F5;border-radius:12px;margin-bottom:8px;cursor:pointer;" onclick="downloadTemplateById(' + t.id + ');closeModal(\'templateSelectModal\');">' +
+          '<div style="display:flex;align-items:center;gap:12px;">' +
+            '<span style="font-size:28px;">' + (extIcon[ext] || '📄') + '</span>' +
+            '<div><div style="font-size:14px;font-weight:500;color:#2D2D2D;">' + (t.name || t.file) + '</div>' +
+            '<div style="font-size:12px;color:#8A8A8A;margin-top:4px;">' + t.file + '</div></div>' +
+          '</div>' +
+          '<span style="font-size:14px;color:#5C6B73;">点击下载 ↓</span>' +
+        '</div>';
+      }).join('');
+  }
+  
+  showModal('templateSelectModal');
+}
+
+// 下载指定ID的模板
+function downloadTemplateById(templateId) {
+  const t = templates.find(x => x.id === templateId);
+  if (!t) return;
+  
+  const a = document.createElement('a');
+  a.href = t.dataUrl || 'data:text/plain;charset=utf-8,模版文件:' + t.file;
+  a.download = t.file;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  showToast('开始下载: ' + t.file, 'success');
+}
+
+// 下载当前选中奖项的模板（调用模板选择弹窗）
+function downloadCurrentAwardTemplate() {
+  showTemplateSelectModal();
+}
+
+// ==================== 数据备份与恢复 ====================
+
+// 显示数据备份弹窗
+function showDataBackupModal() {
+  updateDataOverview();
+  showModal('dataBackupModal');
+}
+
+// 更新数据概览
+function updateDataOverview() {
+  awards = JSON.parse(localStorage.getItem('awards')) || awards;
+  applications = JSON.parse(localStorage.getItem('applications')) || applications;
+  users = JSON.parse(localStorage.getItem('users')) || users;
+  templates = JSON.parse(localStorage.getItem('templates')) || templates;
+  noticeList = JSON.parse(localStorage.getItem('noticeList')) || noticeList;
+  timelines = JSON.parse(localStorage.getItem('timelines')) || timelines;
+  bannerList = JSON.parse(localStorage.getItem('bannerList')) || bannerList;
+  
+  const overview = document.getElementById('dataOverview');
+  if (overview) {
+    overview.innerHTML = 
+      '• 奖项数量：' + awards.length + ' 个<br>' +
+      '• 申报记录：' + applications.length + ' 条<br>' +
+      '• 用户账号：' + users.length + ' 个<br>' +
+      '• 申报模板：' + templates.length + ' 个<br>' +
+      '• 公告通知：' + noticeList.length + ' 条<br>' +
+      '• 时间线项目：' + timelines.length + ' 个<br>' +
+      '• 首页横幅：' + bannerList.length + ' 个';
+  }
+}
+
+// 导出所有数据
+function exportAllData() {
+  const backupData = {
+    version: '1.0',
+    exportTime: new Date().toISOString(),
+    awards: JSON.parse(localStorage.getItem('awards')) || [],
+    applications: JSON.parse(localStorage.getItem('applications')) || [],
+    users: JSON.parse(localStorage.getItem('users')) || [],
+    templates: JSON.parse(localStorage.getItem('templates')) || [],
+    noticeList: JSON.parse(localStorage.getItem('noticeList')) || [],
+    timelines: JSON.parse(localStorage.getItem('timelines')) || [],
+    bannerList: JSON.parse(localStorage.getItem('bannerList')) || [],
+    editLogs: JSON.parse(localStorage.getItem('editLogs')) || []
+  };
+  
+  const dataStr = JSON.stringify(backupData, null, 2);
+  const blob = new Blob([dataStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '激励平台数据备份_' + new Date().toLocaleDateString('zh-CN').replace(/\//g, '-') + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  showToast('✅ 数据导出成功！共 ' + (dataStr.length / 1024).toFixed(1) + ' KB', 'success');
+}
+
+// 导入数据
+function handleImportData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      
+      // 验证数据格式
+      if (!data.version || !data.awards) {
+        showToast('❌ 无效的备份文件格式', 'error');
+        return;
+      }
+      
+      // 确认恢复
+      if (!confirm('即将用备份数据覆盖现有数据。\n\n备份时间：' + new Date(data.exportTime).toLocaleString('zh-CN') + '\n\n是否继续？')) {
+        return;
+      }
+      
+      // 恢复所有数据
+      localStorage.setItem('awards', JSON.stringify(data.awards || []));
+      localStorage.setItem('applications', JSON.stringify(data.applications || []));
+      localStorage.setItem('users', JSON.stringify(data.users || []));
+      localStorage.setItem('templates', JSON.stringify(data.templates || []));
+      localStorage.setItem('noticeList', JSON.stringify(data.noticeList || []));
+      localStorage.setItem('timelines', JSON.stringify(data.timelines || []));
+      localStorage.setItem('bannerList', JSON.stringify(data.bannerList || []));
+      localStorage.setItem('editLogs', JSON.stringify(data.editLogs || []));
+      
+      // 重新加载页面
+      showToast('✅ 数据恢复成功！正在刷新页面...', 'success');
+      setTimeout(() => location.reload(), 1500);
+      
+    } catch (err) {
+      showToast('❌ 文件解析失败：' + err.message, 'error');
+    }
+  };
+  reader.readAsText(file);
+  
+  // 清空input，允许重复选择同一文件
+  event.target.value = '';
+}
+
+function handleFiles(files) { 
+  let totalFiles = files.length;
+  let processedCount = 0;
+  let successCount = 0;
+  let failCount = 0;
+  
+  function checkComplete() {
+    processedCount++;
+    if (processedCount === totalFiles) {
+      // 所有文件处理完成后再显示结果
+      if (successCount > 0 && failCount === 0) {
+        showToast('✅ 附件上传成功 (' + successCount + '个)', 'success');
+      } else if (successCount > 0 && failCount > 0) {
+        showToast('⚠️ 上传完成：' + successCount + '成功，' + failCount + '失败', 'warning');
+      } else if (failCount > 0) {
+        showToast('❌ 上传失败 (' + failCount + '个)', 'error');
+      }
+    }
+  }
+  
+  for(const f of files){
+    if(f.size>10*1024*1024){
+      showToast(f.name + ' 超过10MB限制', 'error');
+      failCount++;
+      checkComplete();
+      continue;
+    }
+    // 转换为base64存储
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      pendingFiles.push({
+        name: f.name,
+        size: f.size,
+        type: f.type,
+        dataUrl: e.target.result
+      });
+      successCount++;
+      renderFileList();
+      checkComplete();
+    };
+    reader.onerror = function() {
+      failCount++;
+      showToast(f.name + ' 上传失败', 'error');
+      checkComplete();
+    };
+    reader.readAsDataURL(f);
+  }
+}
+
+function renderFileList() { 
+  const fileListEl = document.getElementById('fileList');
+  if (!fileListEl) {
+    console.error('fileList元素不存在!');
+    return;
+  }
+  if (pendingFiles.length === 0) {
+    fileListEl.innerHTML = '<div style="padding:12px;color:#8A8A8A;text-align:center;">暂无附件</div>';
+  } else {
+    fileListEl.innerHTML = pendingFiles.map((f,i) => '<div class="file-item"><div class="file-info"><div class="file-icon">📎</div><div><div class="file-name">' + f.name + '</div><div class="file-size">' + formatFileSize(f.size) + '</div></div></div><div class="file-remove" onclick="removeFile(' + i + ')">×</div></div>').join('');
+  }
+}
+
+function removeFile(i){pendingFiles.splice(i,1);renderFileList();}
+
+let editingAppId = null;
+
+// 安全保存数据（处理localStorage满的情况）
+function safeSave(key, data) {
+  try {
+    const jsonStr = JSON.stringify(data);
+    console.log('safeSave: ' + key + ', size: ' + (jsonStr.length / 1024 / 1024).toFixed(2) + ' MB');
+    localStorage.setItem(key, jsonStr);
+    console.log('safeSave: ' + key + ' 成功');
+    return true;
+  } catch (e) {
+    console.error('safeSave 错误:', e);
+    if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_FILE_COREDUMP') {
+      showToast('❌ 存储空间不足！请清理旧数据或减少附件大小', 'error');
+    } else {
+      showToast('❌ 保存失败: ' + e.message, 'error');
+    }
+    return false;
+  }
+}
+
+
+async function submitApplication() {
+  if(!currentUser){showModal('loginModal');showToast('请先登录','error');return;}
+  
+  // 编辑模式下使用原申报的awardId
+  let aid;
+  if (editingAppId) {
+    const editingApp = applications.find(a => a.id == editingAppId);
+    aid = editingApp ? editingApp.awardId : '';
+  } else {
+    aid = document.getElementById('selectAward').value;
+  }
+  
+  if (!aid) { showToast('❌ 请选择申报奖项', 'error'); return; }
+  const n = document.getElementById('applyName').value.trim();
+  const t = document.getElementById('applyTitle').value.trim();
+  if(!n){showToast('❌ 请输入接口人姓名', 'error');return;}
+  if(!t){showToast('❌ 请输入申报项目名称', 'error');return;}
+  const sortOrder = document.getElementById('applySort').value.trim();
+  if(!sortOrder){showToast('❌ 请输入申报排序', 'error');return;}
+  if(pendingFiles.length === 0){showToast('❌ 请上传附件', 'error');return;}
+  
+  const submitBtn = document.getElementById('submitBtn');
+  const originalText = submitBtn.textContent;
+  submitBtn.textContent = '⏳ 提交中...';
+  submitBtn.disabled = true;
+  
+  try {
+    const award = awards.find(a => String(a.id) === String(aid));
+    const filesData = pendingFiles.map(f => ({name: f.name, size: f.size, type: f.type, dataUrl: f.dataUrl}));
+    
+    if (backendAvailable && _authToken) {
+      if (editingAppId) {
+        // 后端更新
+        await api.put('/applications/' + editingAppId, {
+          contact_name: n,
+          project_name: t,
+          sort_order: parseInt(sortOrder),
+          attachments: JSON.stringify(filesData),
+        });
+        showToast('✅ 申报已更新！', 'success');
+      } else {
+        // 后端新增
+        await api.post('/applications', {
+          award_id: aid,
+          award_name: award?.name || '',
+          contact_name: n,
+          project_name: t,
+          sort_order: parseInt(sortOrder),
+          attachments: JSON.stringify(filesData),
+        });
+        showToast('✅ 申报提交成功！', 'success');
+      }
+      // 重新同步数据
+      await syncDataFromBackend();
+    } else {
+      // 本地模式
+      applications = JSON.parse(localStorage.getItem('applications')) || applications;
+      if (editingAppId) {
+        const idx = applications.findIndex(a => a.id == editingAppId);
+        if (idx !== -1) {
+          applications[idx] = { ...applications[idx], userName: n, title: t, sortOrder: parseInt(sortOrder), files: filesData, updateTime: new Date().toISOString() };
+          safeSave('applications', applications);
+          showToast('✅ 申报已更新！', 'success');
+        }
+      } else {
+        const newApp = { id: Date.now(), userId: currentUser.id, userName: n, awardId: aid, awardName: award?.name || '', title: t, sortOrder: parseInt(sortOrder), desc: '', files: filesData, status: 'pending', submitTime: new Date().toISOString() };
+        applications.push(newApp);
+        safeSave('applications', applications);
+        showToast('✅ 申报提交成功！', 'success');
+      }
+    }
+    
+    submitBtn.textContent = editingAppId ? '✅ 已更新' : '✅ 已提交';
+    setTimeout(() => { submitBtn.textContent = originalText; submitBtn.disabled = false; }, 2000);
+    resetApplyForm();
+    
+  } catch (e) {
+    console.error('提交申报异常:', e);
+    submitBtn.textContent = originalText;
+    submitBtn.disabled = false;
+    showToast('❌ 提交失败：' + (e.message || '未知错误'), 'error');
+  }
+}
+
+// 重置申报表单
+function resetApplyForm() {
+  pendingFiles = [];
+  editingAppId = null;
+  const nameEl = document.getElementById('applyName');
+  const titleEl = document.getElementById('applyTitle');
+  const awardEl = document.getElementById('selectAward');
+  const submitBtnEl = document.getElementById('submitBtn');
+  const editModeInfoEl = document.getElementById('editModeInfo');
+  
+  if (nameEl) nameEl.value = '';
+  if (titleEl) titleEl.value = '';
+  const sortEl = document.getElementById('applySort');
+  if (sortEl) sortEl.value = '';
+  if (awardEl) {
+    awardEl.value = '';
+    awardEl.disabled = false;
+  }
+  if (submitBtnEl) submitBtnEl.textContent = '📥 提交申报';
+  if (editModeInfoEl) editModeInfoEl.style.display = 'none';
+  renderFileList();
+  renderMyRecords();
+  renderHomeMyRecords();
+}
+
+// 取消编辑模式
+function cancelEdit() {
+  resetApplyForm();
+}
+
+function resetEditMode() {
+  const editModeInfoEl = document.getElementById('editModeInfo');
+  const submitBtnEl = document.getElementById('submitBtn');
+  const awardEl = document.getElementById('selectAward');
+  
+  if (editModeInfoEl) editModeInfoEl.style.display = 'none';
+  if (submitBtnEl) submitBtnEl.textContent = '📥 提交申报';
+  if (awardEl) awardEl.disabled = false;
+}
+
+// 编辑已有申报
+function editApplication(appId) {
+  const app = applications.find(a => a.id === appId);
+  if (!app) {
+    showToast('未找到申报记录', 'error');
+    return;
+  }
+  
+  // 已通过的申报只能查看，不能修改
+  if (app.status === 'approved') {
+    showApplicationDetail(appId);
+    showToast('已通过的申报不可修改，如需修改请联系管理员', 'info');
+    return;
+  }
+  
+  // 可以修改（待审核、已驳回、已删除的都可以修改）
+  editingAppId = appId;
+  
+  const awardEl = document.getElementById('selectAward');
+  const nameEl = document.getElementById('applyName');
+  const titleEl = document.getElementById('applyTitle');
+  const editModeInfoEl = document.getElementById('editModeInfo');
+  const editModeHintEl = document.getElementById('editModeHint');
+  const submitBtnEl = document.getElementById('submitBtn');
+  
+  if (awardEl) awardEl.value = app.awardId;
+  if (nameEl) nameEl.value = app.userName;
+  if (titleEl) titleEl.value = app.title;
+  const sortEl = document.getElementById('applySort');
+  if (sortEl) sortEl.value = app.sortOrder || '';
+  
+  // 保留原附件到 pendingFiles，避免重新上传
+  pendingFiles = app.files.map(f => ({
+    name: f.name,
+    size: f.size,
+    type: f.type,
+    dataUrl: f.dataUrl
+  }));
+  
+  // 更新附件显示
+  renderFileList();
+  
+  // 显示编辑模式提示
+  if (editModeInfoEl) editModeInfoEl.style.display = 'block';
+  if (editModeHintEl) editModeHintEl.textContent = '正在编辑: ' + app.title;
+  if (submitBtnEl) submitBtnEl.textContent = '✏️ 更新申报';
+  
+  // 滚动到表单顶部
+  const formEl = document.querySelector('.apply-form');
+  if (formEl) formEl.scrollIntoView({ behavior: 'smooth' });
+  
+  showToast('已进入编辑模式，已保留原附件');
+  
+  // 切换到申报页面
+  navigateTo('apply');
+}
+
+// 申报人隔离：只显示自己的记录
+function renderMyRecords() {
+  const c=document.getElementById('myRecords');
+  if(!currentUser){c.innerHTML='<div class="empty-state">请登录后查看申报记录</div>';return;}
+  
+  // 重新加载最新数据
+  applications = JSON.parse(localStorage.getItem('applications')) || applications;
+  awards = JSON.parse(localStorage.getItem('awards')) || awards;
+  
+  const my=applications.filter(a=>a.userId===currentUser.id && !a.deleted);
+  if(my.length===0){c.innerHTML='<div class="empty-state">暂无申报记录</div>';return;}
+  
+  const sm={pending:'待审核',approved:'已通过',rejected:'已驳回'},sc={pending:'pending',approved:'approved',rejected:'rejected'};
+  const safeStatus = (s) => sm[s] ? s : 'pending';
+  
+  c.innerHTML=my.map(a=>{
+    const safeSt = safeStatus(a.status);
+    // 已通过的申报不可修改
+    const editBtn = a.status !== 'approved' ? '<button class="btn btn-secondary" style="height:28px;font-size:11px;margin-left:8px;" onclick="editApplication(' + a.id + ')">✏️ 修改</button>' : '';
+    const viewBtn = a.status === 'approved' ? '<button class="btn btn-secondary" style="height:28px;font-size:11px;margin-left:8px;" onclick="showApplicationDetail(' + a.id + ')">👁 查看</button>' : '';
+    const deleteBtn = a.status !== 'approved' ? '<button class="btn btn-danger" style="height:28px;font-size:11px;margin-left:4px;background:#FF6B6B;" onclick="deleteMyApplication(' + a.id + ')">🗑 删除</button>' : '';
+    const rejectReasonHtml = (a.status === 'rejected' && a.rejectReason) ? '<div style="margin-top:8px;padding:8px 12px;background:#FFF5F5;border:1px solid #FFBABA;border-radius:8px;font-size:12px;color:#D63031;">❌ 驳回原因：' + a.rejectReason + '</div>' : '';
+    
+    return '<div class="record-item">' +
+      '<div class="record-header">' +
+        '<span class="record-award">' + a.awardName + '</span>' +
+        '<span class="record-status ' + sc[safeSt] + '">' + sm[safeSt] + '</span>' +
+      '</div>' +
+      '<div class="award-desc" style="margin-bottom:8px;">' + a.title + '</div>' +
+      '<div class="record-files">' + a.files.map((f,i)=>'<span class="record-file" onclick="downloadSubmittedFile(' + a.id + ',' + i + ')">📎 ' + f.name + '</span>').join('') + '</div>' +
+      '<div class="record-time">提交时间：' + formatDateTime(a.submitTime) + viewBtn + editBtn + deleteBtn + '</div>' +
+      rejectReasonHtml +
+    '</div>';
+  }).join('');
+}
+
+// 申报人删除自己的申报（管理员保留历史）
+async function deleteMyApplication(appId) {
+  if (!confirm('确定要删除这条申报记录吗？')) return;
+  
+  try {
+    if (backendAvailable && _authToken) {
+      await api.del('/applications/' + appId);
+      showToast('✅ 申报已删除', 'success');
+      await syncDataFromBackend();
+    } else {
+      // 本地模式
+      applications = JSON.parse(localStorage.getItem('applications')) || applications;
+      const idx = applications.findIndex(a => a.id == appId);
+      if (idx !== -1) {
+        applications[idx] = { ...applications[idx], deleted: true, deletedBy: currentUser.id, deletedTime: new Date().toISOString() };
+        safeSave('applications', applications);
+        showToast('✅ 申报已删除', 'success');
+      }
+    }
+    renderMyRecords();
+    renderHomeMyRecords();
+  } catch(e) {
+    showToast('❌ 删除失败：' + e.message, 'error');
+  }
+}
+
+function downloadSubmittedFile(appId, fileIndex) {
+  const app = applications.find(a => a.id === appId);
+  if (app && app.files[fileIndex] && app.files[fileIndex].dataUrl) {
+    const link = document.createElement('a');
+    link.href = app.files[fileIndex].dataUrl;
+    link.download = app.files[fileIndex].name;
+    link.click();
+  }
+}
+
+// ==================== 管理员 ====================
+function initAdmin() {
+  if(!currentUser||currentUser.role!=='admin')return;
+  
+  // 重新从localStorage加载最新数据，确保数据同步
+  awards = JSON.parse(localStorage.getItem('awards')) || awards;
+  applications = JSON.parse(localStorage.getItem('applications')) || applications;
+  users = JSON.parse(localStorage.getItem('users')) || users;
+  templates = JSON.parse(localStorage.getItem('templates')) || templates;
+  noticeList = JSON.parse(localStorage.getItem('noticeList')) || noticeList;
+  timelines = JSON.parse(localStorage.getItem('timelines')) || timelines;
+  editLogs = JSON.parse(localStorage.getItem('editLogs')) || editLogs;
+  
+  // 渲染统计数据
+  document.getElementById('statTotal').textContent=applications.length;
+  document.getElementById('statPending').textContent=applications.filter(a=>a.status==='pending').length;
+  document.getElementById('statAwards').textContent=awards.filter(a=>a.status==='active').length;
+  document.getElementById('statToday').textContent=applications.filter(a=>a.submitTime.startsWith(new Date().toISOString().split('T')[0])).length;
+  
+  // 渲染图表
+  renderChart();
+  
+  // 初始化其他面板
+  renderAdminAwards();
+  renderSubmissions();
+  renderUsers();
+  renderNotices();
+  renderTimelines();
+  renderCommonTemplates();
+  renderEditLogs();
+  updateFilterOptions();
+  updateTemplateAwardSelect();
+}
+
+function renderChart() {
+  const bars = document.getElementById('chartBars');
+  if (!bars) return;
+  
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    days.push(d.toISOString().split('T')[0]);
+  }
+  
+  const counts = days.map(day => applications.filter(a => a.submitTime.startsWith(day)).length);
+  const maxCount = Math.max(...counts, 1);
+  
+  let html = '';
+  for (let i = 0; i < days.length; i++) {
+    const h = Math.max(20, (counts[i] / maxCount) * 150);
+    const d = new Date(days[i]);
+    const month = d.getMonth() + 1;
+    const date = d.getDate();
+    const label = month + '/' + date;
+    html += '<div style="text-align:center;">' +
+      '<div style="width:40px;height:' + h + 'px;background:#5C6B73;border-radius:4px 4px 0 0;margin-bottom:8px;"></div>' +
+      '<div style="font-size:11px;color:#8A8A8A;">' + label + '</div>' +
+      '<div style="font-size:12px;color:#2D2D2D;font-weight:500;">' + counts[i] + '</div>' +
+    '</div>';
+  }
+  bars.innerHTML = html;
+}
+
+function switchAdminPanel(panel) {
+  // 切换面板前重新加载最新数据
+  if (panel === 'awards' || panel === 'templates' || panel === 'submissions') {
+    awards = JSON.parse(localStorage.getItem('awards')) || awards;
+  }
+  if (panel === 'users') {
+    users = JSON.parse(localStorage.getItem('users')) || users;
+  }
+  if (panel === 'notices') {
+    noticeList = JSON.parse(localStorage.getItem('noticeList')) || noticeList;
+  }
+  if (panel === 'timeline') {
+    timelines = JSON.parse(localStorage.getItem('timelines')) || timelines;
+  }
+  if (panel === 'templates') {
+    templates = JSON.parse(localStorage.getItem('templates')) || templates;
+    updateTemplateAwardSelect();
+  }
+  if (panel === 'editlogs') {
+    editLogs = JSON.parse(localStorage.getItem('editLogs')) || editLogs;
+  }
+  
+  document.querySelectorAll('.admin-menu-item').forEach(item => {
+    item.classList.toggle('active', item.dataset.adminPanel === panel);
+  });
+  document.querySelectorAll('.admin-panel').forEach(p => p.style.display = 'none');
+  document.getElementById('panel-' + panel).style.display = 'block';
+  
+  // 根据面板类型刷新对应内容
+  if (panel === 'awards') renderAdminAwards();
+  if (panel === 'submissions') { updateFilterOptions(); renderSubmissions(); }
+  if (panel === 'users') renderUsers();
+  if (panel === 'notices') renderNotices();
+  if (panel === 'timeline') renderTimelines();
+  if (panel === 'editlogs') renderEditLogs();
+  if (panel === 'banners') renderAdminBanners();
+}
+
+function renderAdminAwards() {
+  const s={active:'进行中',pending:'未开放',closed:'已结束'};
+  
+  // 重新加载最新数据
+  awards = JSON.parse(localStorage.getItem('awards')) || awards;
+  
+  document.getElementById('adminAwardsList').innerHTML=awards.map(a=>{
+    const ruleImageStatus = a.ruleImage ? '<span style="color:#5C6B73;">📷 已上传</span>' : '<span style="color:#8A8A8A;">📷 未上传</span>';
+    return '<div class="award-config-item">' +
+      '<div class="award-config-header">' +
+        '<span class="award-config-name">' + a.name + '</span>' +
+        '<div class="award-config-actions">' +
+          '<button class="config-btn edit" onclick="editAward(\'' + a.id + '\')">编辑</button>' +
+          '<button class="config-btn upload" onclick="uploadAwardRuleImage(\'' + a.id + '\')">📷 上传规则</button>' +
+          '<button class="config-btn delete" onclick="deleteAward(\'' + a.id + '\')">删除</button>' +
+        '</div>' +
+      '</div>' +
+      '<div style="font-size:12px;color:#8A8A8A;margin-bottom:8px;">' + a.desc + '</div>' +
+      '<div style="font-size:12px;">' +
+        '<span style="color:#5C6B73;">激励导向：</span>' + (a.direction || '暂无') +
+        '<span style="margin-left:16px;color:#D4A574;">评选方式：</span>' + (a.method || '暂无') +
+        '<span style="margin-left:16px;">截止：</span>' + (a.deadline || '未设置') +
+        '<span style="margin-left:16px;">' + ruleImageStatus + '</span>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+// 上传奖项规则图片
+function uploadAwardRuleImage(awardId) {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.jpg,.jpeg,.png,.gif,.webp';
+  input.onchange = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      const imageData = evt.target.result;
+      
+      // 更新奖项数据
+      awards = JSON.parse(localStorage.getItem('awards')) || awards;
+      const idx = awards.findIndex(a => a.id === awardId);
+      if (idx !== -1) {
+        awards[idx].ruleImage = imageData;
+        saveData();
+        
+        // 同步到激励速递
+        syncAwardToNotices(awards[idx], awards[idx]);
+        saveData();
+        
+        renderAdminAwards();
+        renderNews();
+        showToast('激励规则图片上传成功');
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
+
+let ruleImageFiles = [];
+
+function showAddAwardModal(){
+  editingAwardId=null;
+  ruleImageFiles = [];
+  updateRuleImagePreview();
+  document.getElementById('awardModalTitle').textContent='添加奖项';
+  document.getElementById('awardName').value='';
+  document.getElementById('awardDesc').value='';
+  document.getElementById('awardDirection').value='';
+  document.getElementById('awardMethod').value='committee';
+  document.getElementById('awardDeadline').value='';
+  document.getElementById('awardStatus').value='pending';
+  showModal('awardModal');
+}
+
+function editAward(id){
+  editingAwardId=id;
+  const a=awards.find(x=>x.id===id);
+  if(!a)return;
+  
+  // 加载已有规则图片
+  ruleImageFiles = a.ruleImages ? [...a.ruleImages] : [];
+  updateRuleImagePreview();
+  
+  document.getElementById('awardModalTitle').textContent='编辑奖项';
+  document.getElementById('awardName').value=a.name;
+  document.getElementById('awardDesc').value=a.desc;
+  document.getElementById('awardDirection').value=a.direction;
+  document.getElementById('awardMethod').value=a.method;
+  document.getElementById('awardDeadline').value=a.deadline;
+  document.getElementById('awardStatus').value=a.status;
+  
+  showModal('awardModal');
+}
+
+// 重置规则图片上传区域
+function resetRuleImageUpload() {
+  currentRuleImage = null;
+  document.getElementById('ruleImageUpload').style.display = 'block';
+  document.getElementById('ruleImagePreviewContainer').style.display = 'none';
+  document.getElementById('ruleImageInput').value = '';
+}
+
+// 处理规则图片上传
+function handleRuleImageUpload(event) {
+  const files = Array.from(event.target.files);
+  if (files.length === 0) return;
+  
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+  
+  files.forEach(file => {
+    // 检查文件类型
+    if (!allowedTypes.includes(file.type)) {
+      showToast('仅支持 JPG、PNG、GIF、WEBP 格式图片', 'error');
+      return;
+    }
+    
+    // 检查文件大小 (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('图片不能超过5MB', 'error');
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      // 初始化数组
+      if (!ruleImageFiles) ruleImageFiles = [];
+      // 添加到数组
+      ruleImageFiles.push(e.target.result);
+      // 更新预览
+      updateRuleImagePreview();
+      showToast('图片上传成功 (' + ruleImageFiles.length + '张)');
+    };
+    reader.readAsDataURL(file);
+  });
+  
+  event.target.value = '';
+}
+
+// 更新激励规则图片预览
+function updateRuleImagePreview() {
+  const container = document.getElementById('ruleImagePreviewContainer');
+  if (!ruleImageFiles || ruleImageFiles.length === 0) {
+    container.style.display = 'none';
+    document.getElementById('ruleImageUpload').style.display = 'flex';
+    return;
+  }
+  
+  container.style.display = 'block';
+  document.getElementById('ruleImageUpload').style.display = 'none';
+  
+  container.innerHTML = ruleImageFiles.map((img, idx) => 
+    '<div style="position:relative;display:inline-block;margin:4px;">' +
+      '<img src="' + img + '" style="max-width:120px;max-height:100px;border-radius:8px;">' +
+      '<button style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;background:#C07D6F;border-radius:50%;color:#fff;border:none;cursor:pointer;font-size:12px;line-height:1;" onclick="removeRuleImage(' + idx + ')">×</button>' +
+    '</div>'
+  ).join('') + '<button class="btn btn-secondary" style="margin-top:8px;" onclick="clearRuleImages()">清空全部</button>';
+}
+
+// 删除单张图片
+function removeRuleImage(idx) {
+  if (ruleImageFiles && ruleImageFiles[idx] !== undefined) {
+    ruleImageFiles.splice(idx, 1);
+    updateRuleImagePreview();
+  }
+}
+
+// 清空所有图片
+function clearRuleImages() {
+  ruleImageFiles = [];
+  updateRuleImagePreview();
+}
+
+// 删除规则图片
+function removeRuleImage() {
+  currentRuleImage = null;
+  resetRuleImageUpload();
+}
+
+// 初始化规则图片上传点击区域
+function initRuleImageUpload() {
+  const uploadArea = document.getElementById('ruleImageUpload');
+  if (uploadArea) {
+    uploadArea.addEventListener('click', () => {
+      document.getElementById('ruleImageInput').click();
+    });
+  }
+}
+
+async function saveAward() {
+  const n=document.getElementById('awardName').value.trim();
+  const de=document.getElementById('awardDesc').value.trim();
+  const di=document.getElementById('awardDirection').value.trim();
+  const me=document.getElementById('awardMethod').value.trim();
+  const dl=document.getElementById('awardDeadline').value;
+  const st=document.getElementById('awardStatus').value;
+  
+  if(!n){showToast('请输入奖项名称','error');return;}
+  
+  const ruleImagesJson = ruleImageFiles && ruleImageFiles.length > 0 ? JSON.stringify(ruleImageFiles) : null;
+  
+  if (backendAvailable && _authToken) {
+    try {
+      const body = { name: n, description: de, icon: 'star', status: st, deadline: dl || null, rule: di, rule_images: ruleImagesJson };
+      if (editingAwardId) {
+        await api.put('/awards/' + editingAwardId, body);
+        showToast('奖项已更新');
+      } else {
+        await api.post('/awards', body);
+        showToast('奖项已添加');
+      }
+      await syncDataFromBackend();
+    } catch(e) {
+      showToast('❌ 保存失败：' + e.message, 'error');
+      return;
+    }
+  } else {
+    // 本地模式
+    awards = JSON.parse(localStorage.getItem('awards')) || awards;
+    noticeList = JSON.parse(localStorage.getItem('noticeList')) || noticeList;
+    if(editingAwardId){
+      const i=awards.findIndex(x=>String(x.id)===String(editingAwardId));
+      if(i!==-1) {
+        const oldAward = awards[i];
+        awards[i]={...awards[i],name:n,desc:de,direction:di,method:me,deadline:dl,status:st,ruleImages:ruleImageFiles ? [...ruleImageFiles] : (awards[i].ruleImages || [])};
+        syncAwardToNotices(oldAward, awards[i]);
+      }
+    } else {
+      const newAward = {id:'award_'+Date.now(),name:n,desc:de,direction:di,method:me,deadline:dl,status:st,icon:'star',ruleImages:ruleImageFiles ? [...ruleImageFiles] : []};
+      awards.push(newAward);
+      addAwardToNotices(newAward);
+    }
+    saveData();
+    showToast(editingAwardId?'奖项已更新':'奖项已添加');
+  }
+  
+  closeModal('awardModal');
+  renderAdminAwards();
+  renderAwards();
+  renderNews();
+  updateFilterOptions();
+  updateTemplateAwardSelect();
+}
+
+// 同步奖项更新到激励速递公告
+function syncAwardToNotices(oldAward, newAward) {
+  // 查找是否已有该奖项的公告
+  const noticeKeyword = oldAward.name;
+  const existingNotice = noticeList.find(n => n.title.includes(oldAward.name) && n.type === 'update');
+  
+  const methodText = newAward.method || '待定';
+  const statusText = newAward.status === 'active' ? '申报进行中' : newAward.status === 'pending' ? '申报暂未开放' : '申报已结束';
+  const content = newAward.name + '激励规则已更新。激励导向：' + (newAward.direction || '暂无') + '。评选方式：' + methodText + '。申报截止时间：' + (newAward.deadline || '待定') + '。当前状态：' + statusText + '。';
+  
+  if (existingNotice) {
+    // 更新现有公告
+    const idx = noticeList.findIndex(n => n.id === existingNotice.id);
+    if (idx !== -1) {
+      noticeList[idx] = {
+        ...noticeList[idx],
+        title: newAward.name + ' 激励规则更新',
+        content: content,
+        date: new Date().toISOString().split('T')[0]
+      };
+    }
+  } else {
+    // 添加新公告
+    noticeList.unshift({
+      id: Date.now(),
+      title: newAward.name + ' 激励规则已更新',
+      content: content,
+      type: 'update',
+      date: new Date().toISOString().split('T')[0],
+      awardId: newAward.id
+    });
+  }
+}
+
+// 添加新奖项到激励速递公告
+function addAwardToNotices(award) {
+  const methodText = award.method || '待定';
+  const content = '新奖项上线：' + award.name + '。激励导向：' + (award.direction || '暂无') + '。评选方式：' + methodText + '。申报截止时间：' + (award.deadline || '待定') + '。';
+  
+  noticeList.unshift({
+    id: Date.now(),
+    title: '新奖项上线：' + award.name,
+    content: content,
+    type: 'notice',
+    date: new Date().toISOString().split('T')[0],
+    awardId: award.id
+  });
+}
+
+async function deleteAward(id){
+  if(!confirm('确定要删除这个奖项吗？'))return;
+  try {
+    if (backendAvailable && _authToken) {
+      await api.del('/awards/' + id);
+      await syncDataFromBackend();
+    } else {
+      awards = awards.filter(a => String(a.id) !== String(id));
+      saveData();
+    }
+    renderAdminAwards();
+    renderAwards();
+    showToast('奖项已删除');
+  } catch(e) {
+    showToast('❌ 删除失败：' + e.message, 'error');
+  }
+}
+
+function updateFilterOptions(){
+  document.getElementById('filterAward').innerHTML='<option value="">全部奖项</option>'+awards.map(a=>`<option value="${a.id}">${a.name}</option>`).join('');
+}
+
+// 批量选择相关变量
+let selectedSubmissionIds = new Set();
+
+function renderSubmissions() {
+  const fa=document.getElementById('filterAward').value,fs=document.getElementById('filterStatus').value,sk=document.getElementById('searchKeyword').value.toLowerCase();
+  let f=[...applications].filter(a=>!a.deleted); // 默认只显示未删除
+  if(fa)f=f.filter(a=>a.awardId===fa);if(fs)f=f.filter(a=>a.status===fs);if(sk)f=f.filter(a=>a.userName.toLowerCase().includes(sk)||a.title.toLowerCase().includes(sk));
+  const sm={pending:'待审核',approved:'已通过',rejected:'已驳回'},sc={pending:'pending',approved:'approved',rejected:'rejected'};
+  const safeStatus = (s) => sm[s] ? s : 'pending';
+  
+  // 过滤后重新同步选中状态
+  selectedSubmissionIds = new Set([...selectedSubmissionIds].filter(id => f.some(a => a.id === id)));
+  updateBatchActionBar();
+  
+  document.getElementById('submissionsTable').innerHTML=f.length===0?'<tr><td colspan="9" class="empty-state">暂无申报记录</td></tr>':f.map(a=>{
+    const safeSt = safeStatus(a.status);
+    const checked = selectedSubmissionIds.has(a.id) ? 'checked' : '';
+    return `<tr style="${a.deleted ? 'opacity:0.5;' : ''}">
+      <td><input type="checkbox" ${checked} onchange="toggleSubmissionSelection(${a.id})" style="cursor:pointer;"></td>
+      <td><div style="font-weight:500;">${a.userName}</div><div style="font-size:11px;color:#8A8A8A;">${a.dept||''}</div></td>
+      <td>${a.awardName}</td><td>${a.title}</td><td>${a.files.length}个附件</td><td>${formatDateTime(a.submitTime)}</td><td><span class="record-status ${sc[safeSt]}">${sm[safeSt]}</span></td><td class="actions"><button class="action-btn view-btn" onclick="viewApplication(${a.id})">查看</button></td></tr>`;
+  }).join('');
+}
+
+// 切换单个选中状态
+function toggleSubmissionSelection(id) {
+  if (selectedSubmissionIds.has(id)) {
+    selectedSubmissionIds.delete(id);
+  } else {
+    selectedSubmissionIds.add(id);
+  }
+  updateBatchActionBar();
+}
+
+// 全选/取消全选
+function toggleSelectAllSubmissions() {
+  const fa=document.getElementById('filterAward').value,fs=document.getElementById('filterStatus').value,sk=document.getElementById('searchKeyword').value.toLowerCase();
+  let f=[...applications].filter(a=>!a.deleted);
+  if(fa)f=f.filter(a=>a.awardId===fa);if(fs)f=f.filter(a=>a.status===fs);if(sk)f=f.filter(a=>a.userName.toLowerCase().includes(sk)||a.title.toLowerCase().includes(sk));
+  
+  const selectAll = document.getElementById('selectAllSubmissions').checked || document.getElementById('selectAllSubmissionsHeader').checked;
+  
+  if (selectAll) {
+    f.forEach(a => selectedSubmissionIds.add(a.id));
+  } else {
+    selectedSubmissionIds.clear();
+  }
+  renderSubmissions();
+}
+
+// 更新批量操作栏显示
+function updateBatchActionBar() {
+  const bar = document.getElementById('batchActionBar');
+  const count = document.getElementById('selectedCount');
+  if (bar && count) {
+    bar.style.display = selectedSubmissionIds.size > 0 ? 'block' : 'none';
+    count.textContent = selectedSubmissionIds.size;
+  }
+}
+
+// 批量通过
+function batchApproveSubmissions() {
+  if (selectedSubmissionIds.size === 0) {
+    showToast('请先选择要通过的申报', 'error');
+    return;
+  }
+  
+  if (!confirm('确定要批量通过 ' + selectedSubmissionIds.size + ' 项申报吗？')) return;
+  
+  let count = 0;
+  selectedSubmissionIds.forEach(id => {
+    const app = applications.find(a => a.id === id);
+    if (app) {
+      app.status = 'approved';
+      app.auditTime = new Date().toISOString();
+      app.auditor = currentUser.id;
+      count++;
+    }
+  });
+  
+  safeSave('applications', applications);
+  selectedSubmissionIds.clear();
+  renderSubmissions();
+  renderHomeMyRecords();
+  showToast('已批量通过 ' + count + ' 项申报');
+}
+
+// 批量驳回（显示原因输入弹窗）
+function showBatchRejectModal() {
+  if (selectedSubmissionIds.size === 0) {
+    showToast('请先选择要驳回的申报', 'error');
+    return;
+  }
+  document.getElementById('batchRejectCount').textContent = selectedSubmissionIds.size;
+  document.getElementById('batchRejectReason').value = '';
+  showModal('batchRejectModal');
+}
+
+// 确认批量驳回
+function confirmBatchReject() {
+  const reason = document.getElementById('batchRejectReason').value.trim();
+  if (!reason) {
+    showToast('请输入驳回原因', 'error');
+    return;
+  }
+  
+  let count = 0;
+  selectedSubmissionIds.forEach(id => {
+    const app = applications.find(a => a.id === id);
+    if (app) {
+      app.status = 'rejected';
+      app.rejectReason = reason;
+      app.auditTime = new Date().toISOString();
+      app.auditor = currentUser.id;
+      count++;
+    }
+  });
+  
+  safeSave('applications', applications);
+  closeModal('batchRejectModal');
+  selectedSubmissionIds.clear();
+  renderSubmissions();
+  renderHomeMyRecords();
+  showToast('已批量驳回 ' + count + ' 项申报');
+}
+
+function viewApplication(id){
+  const a=applications.find(x=>x.id===id);
+  if(!a)return;
+  currentDetailId=id;
+  document.getElementById('auditStatus').value=a.status;
+  
+  const statusText = {pending:'待审核',approved:'已通过',rejected:'已驳回'}[a.status] || a.status;
+  const statusColor = {pending:'#D4A574',approved:'#81B29A',rejected:'#C07D6F'}[a.status] || '#666';
+  const sm = {pending:'待审核',approved:'已通过',rejected:'已驳回'}, sc = {pending:'pending',approved:'approved',rejected:'rejected'};
+  const safeSt = sm[a.status] ? a.status : 'pending';
+  
+  // 获取审核人信息
+  let auditorName = '';
+  if (a.auditor) {
+    const auditor = users.find(u => u.id === a.auditor);
+    auditorName = auditor ? auditor.name : a.auditor;
+  }
+  
+  // 修改记录
+  let editHistoryHtml = '';
+  if (a.editHistory && a.editHistory.length > 0) {
+    editHistoryHtml = `<div class="detail-section"><div class="detail-label">📝 修改记录（共 ${a.editHistory.length} 次）</div>
+      <div class="detail-value" style="background:#FAF8F5;border-radius:12px;padding:12px;">
+        ${a.editHistory.map((e, ei) => `<div style="padding:10px 0;border-bottom:1px dashed #E8E4DF;font-size:13px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span style="color:#8A8A8A;">${formatDateTime(e.time)} - ${e.userName || '申报人'}</span>
+            ${e.oldFiles && e.oldFiles.length > 0 ? `<button class="btn btn-secondary" style="height:24px;font-size:11px;" onclick="downloadOldFiles(${a.id},${ei})">📦 下载旧附件(${e.oldFiles.length}个)</button>` : ''}
+          </div>
+          <div>${e.changes.map(c => `<span style="background:#FFE8D6;padding:2px 8px;border-radius:4px;margin-right:8px;">${c.field}: ${c.old} → ${c.new}</span>`).join('')}</div>
+          ${e.newFiles && e.newFiles.length > 0 ? `<div style="margin-top:4px;color:#8A8A8A;">新附件: ${e.newFiles.map(f => f.name).join(', ')}</div>` : ''}
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }
+  
+  // 驳回原因
+  let rejectReasonHtml = '';
+  if (a.status === 'rejected' && a.rejectReason) {
+    rejectReasonHtml = `<div class="detail-section"><div class="detail-label">❌ 驳回原因</div>
+      <div class="detail-value" style="background:#FFF5F5;border:1px solid #FFBABA;border-radius:12px;padding:12px;color:#D63031;">${a.rejectReason}</div>
+    </div>`;
+  }
+  
+  document.getElementById('detailContent').innerHTML=`
+    <div class="detail-section"><div class="detail-label">申报人</div><div class="detail-value">${a.userName} (${a.dept||''})</div></div>
+    <div class="detail-section"><div class="detail-label">联系方式</div><div class="detail-value">${a.contact||'无'}</div></div>
+    <div class="detail-section"><div class="detail-label">奖项</div><div class="detail-value">${a.awardName}</div></div>
+    <div class="detail-section"><div class="detail-label">申报标题</div><div class="detail-value">${a.title}</div></div>
+    <div class="detail-section"><div class="detail-label">当前状态</div>
+      <div class="detail-value"><span class="record-status ${sc[safeSt]}" style="font-size:14px;font-weight:600;">${sm[safeSt]}</span></div>
+    </div>
+    <div class="detail-section"><div class="detail-label">提交时间</div><div class="detail-value">${formatDateTime(a.submitTime)}</div></div>
+    ${a.auditTime ? `<div class="detail-section"><div class="detail-label">审核时间</div><div class="detail-value">${formatDateTime(a.auditTime)}${auditorName ? '（审核人：' + auditorName + '）' : ''}</div></div>` : ''}
+    ${rejectReasonHtml}
+    ${editHistoryHtml}
+    <div class="detail-section"><div class="detail-label">📎 附件列表</div>
+      <div class="detail-value">${a.files.length > 0 ? a.files.map((f,i)=>`<div style="padding:10px 0;border-bottom:1px solid rgba(92,107,115,0.08);display:flex;justify-content:space-between;align-items:center;">
+        <div><span>📄 ${f.name}</span><span style="color:#8A8A8A;font-size:12px;margin-left:8px;">${formatFileSize(f.size)}</span></div>
+        <button class="btn btn-secondary" style="height:28px;font-size:12px;" onclick="downloadAppFile(${a.id},${i})">下载</button>
+      </div>`).join('') : '<span style="color:#8A8A8A;">无附件</span>'}</div>
+    </div>
+    <div class="detail-section"><div class="detail-label">用户ID</div><div class="detail-value" style="font-size:12px;color:#8A8A8A;">${a.userId}</div></div>
+  `;
+  showModal('detailModal');
+}
+
+function downloadAppFile(appId, fileIndex) {
+  const app = applications.find(a => a.id === appId);
+  if (app && app.files[fileIndex] && app.files[fileIndex].dataUrl) {
+    const link = document.createElement('a');
+    link.href = app.files[fileIndex].dataUrl;
+    link.download = app.files[fileIndex].name;
+    link.click();
+  }
+}
+
+// 下载历史附件
+function downloadOldFiles(appId, historyIndex) {
+  const app = applications.find(a => a.id === appId);
+  if (!app || !app.editHistory || !app.editHistory[historyIndex]) return;
+  
+  const oldFiles = app.editHistory[historyIndex].oldFiles;
+  if (!oldFiles || oldFiles.length === 0) {
+    showToast('无历史附件', 'error');
+    return;
+  }
+  
+  const editTime = app.editHistory[historyIndex].time;
+  const timeStr = formatDateTime(editTime).replace(/[/: ]/g, '-');
+  
+  oldFiles.forEach((f, i) => {
+    setTimeout(() => {
+      if (f.dataUrl) {
+        const a = document.createElement('a');
+        a.href = f.dataUrl;
+        a.download = '历史附件_' + timeStr + '/' + f.name;
+        a.click();
+      }
+    }, i * 200);
+  });
+  
+  showToast('开始下载历史附件', 'success');
+}
+
+// 切换审核状态时显示/隐藏驳回原因输入框
+function toggleRejectReason() {
+  const status = document.getElementById('auditStatus').value;
+  const reasonInput = document.getElementById('rejectReason');
+  if (status === 'rejected') {
+    reasonInput.style.display = 'block';
+    reasonInput.focus();
+  } else {
+    reasonInput.style.display = 'none';
+  }
+}
+
+async function updateStatus(){
+  if(!currentDetailId)return;
+  const st=document.getElementById('auditStatus').value;
+  const reason=document.getElementById('rejectReason').value.trim();
+  
+  try {
+    if (backendAvailable && _authToken) {
+      await api.post('/applications/' + currentDetailId + '/review', { status: st, comment: reason });
+      showToast('状态已更新');
+      await syncDataFromBackend();
+    } else {
+      // 本地模式
+      applications = JSON.parse(localStorage.getItem('applications')) || applications;
+      const i = applications.findIndex(x => x.id == currentDetailId);
+      if (i !== -1) {
+        applications[i].status = st;
+        if (st === 'rejected' && reason) applications[i].rejectReason = reason;
+        saveData();
+        showToast('状态已更新');
+      }
+    }
+    renderSubmissions();
+    initAdmin();
+  } catch(e) {
+    showToast('❌ 更新失败：' + e.message, 'error');
+  }
+  closeModal('detailModal');
+}
+
+// 导出全部申报信息
+function exportAllSubmissions() {
+  if (applications.length === 0) {
+    showToast('没有可导出的数据', 'error');
+    return;
+  }
+  
+  const h=['序号','申报人','部门','联系方式','奖项','申报标题','申报说明','附件文件名','附件大小','用户ID','状态','提交时间'];
+  const rows=applications.map((a,i)=>[
+    i+1,
+    a.userName,
+    a.dept,
+    a.contact,
+    a.awardName,
+    a.title,
+    a.desc||'',
+    a.files.map(f=>f.name).join('; '),
+    a.files.map(f=>formatFileSize(f.size)).join('; '),
+    a.userId,
+    a.status==='pending'?'待审核':a.status==='approved'?'已通过':'已驳回',
+    formatDateTime(a.submitTime)
+  ]);
+  
+  let csv='\uFEFF'+h.join(',')+'\n';
+  rows.forEach(r=>{csv+=r.map(c=>`"${(c||'').toString().replace(/"/g,'""')}"`).join(',')+'\n';});
+  
+  const b=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(b);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`申报汇总_全部_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`已导出 ${applications.length} 条记录`);
+}
+
+// ==================== 用户管理 ====================
+function renderUsers() {
+  const keyword = document.getElementById('userSearchKeyword')?.value?.toLowerCase() || '';
+  const filteredUsers = keyword ? users.filter(u => u.username.toLowerCase().includes(keyword)) : users;
+  
+  if (filteredUsers.length === 0) {
+    document.getElementById('usersList').innerHTML = '<div class="empty-state">暂无用户</div>';
+    return;
+  }
+  
+  document.getElementById('usersList').innerHTML = filteredUsers.map(u => `
+    <div class="user-item">
+      <div class="user-info-item">
+        <div class="user-avatar">${u.username[0].toUpperCase()}</div>
+        <div class="user-details">
+          <div class="user-name">${u.username}</div>
+          <div class="user-meta">密码: ${u.password ? (u.passwordChanged ? '已修改' : '******') : '未设置'}</div>
+          <div class="user-meta">注册时间: ${u.createdAt ? formatDateTime(u.createdAt) : '未知'}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span class="user-badge ${u.role}">${u.role === 'admin' ? '管理员' : '普通用户'}</span>
+        <button class="config-btn edit" onclick="editUser('${u.id}')">编辑</button>
+        <button class="config-btn delete" onclick="deleteUser('${u.id}')">删除</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function showAddUserModal() {
+  document.getElementById('userModalTitle').textContent = '添加用户';
+  document.getElementById('userName').value = '';
+  document.getElementById('userPassword').value = '';
+  document.getElementById('userRole').value = 'user';
+  editingUserId = null;
+  showModal('userModal');
+}
+
+let editingUserId = null;
+
+function editUser(id) {
+  const user = users.find(u => u.id === id);
+  if (!user) return;
+  
+  editingUserId = id;
+  document.getElementById('userModalTitle').textContent = '编辑用户';
+  document.getElementById('userName').value = user.username;
+  document.getElementById('userPassword').value = user.password || '';
+  document.getElementById('userRole').value = user.role;
+  
+  // 显示密码修改提示
+  const passwordHint = document.getElementById('userPasswordHint');
+  if (passwordHint) {
+    if (user.passwordChanged) {
+      passwordHint.innerHTML = '<span style="color:#7A6B5A;">⚠️ 密码已被修改过，如需再次修改请联系管理员</span>';
+    } else {
+      passwordHint.innerHTML = '<span style="color:#8A8A8A;">留空则保持不变</span>';
+    }
+  }
+  
+  showModal('userModal');
+}
+
+function saveUser() {
+  const name = document.getElementById('userName').value.trim();
+  const password = document.getElementById('userPassword').value;
+  const role = document.getElementById('userRole').value;
+  
+  if (!name) {
+    showToast('请输入用户名', 'error');
+    return;
+  }
+  
+  if (editingUserId) {
+    // 编辑
+    const idx = users.findIndex(u => u.id === editingUserId);
+    if (idx !== -1) {
+      users[idx].username = name;
+      if (password) {
+        // 管理员可以修改密码，并标记为已修改
+        users[idx].password = password;
+        users[idx].passwordChanged = true;
+      }
+      users[idx].role = role;
+      saveData();
+      renderUsers();
+      closeModal('userModal');
+      showToast('用户已更新');
+    }
+  } else {
+    // 新增
+    if (!password) {
+      showToast('请输入初始密码', 'error');
+      return;
+    }
+    users.push({
+      id: 'user_' + Date.now(),
+      username: name,
+      password: password,
+      role: role,
+      createdAt: new Date().toISOString(),
+      passwordChanged: false
+    });
+    saveData();
+    renderUsers();
+    closeModal('userModal');
+    showToast('用户已添加');
+  }
+}
+
+function deleteUser(id) {
+  if (!confirm('确定要删除该用户吗？')) return;
+  users = users.filter(u => u.id !== id);
+  saveData();
+  renderUsers();
+  showToast('用户已删除');
+}
+
+// ==================== 模版管理 ====================
+function updateTemplateAwardSelect() {
+  document.getElementById('templateAwardSelect').innerHTML = '<option value="">请选择奖项</option>' + awards.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
+}
+
+function triggerTemplateUpload() {
+  const awardId = document.getElementById('templateAwardSelect').value;
+  if (!awardId) {
+    showToast('请先选择奖项', 'error');
+    return;
+  }
+  document.getElementById('templateFileInput').click();
+}
+
+function loadAwardTemplates() {
+  const awardId = document.getElementById('templateAwardSelect').value;
+  const list = document.getElementById('awardTemplateList');
+  
+  if (!awardId) {
+    list.innerHTML = '<div class="no-template">请先选择奖项</div>';
+    return;
+  }
+  
+  const awardTemplates = templates.filter(t => t.awardId === awardId && t.type === 'award');
+  
+  if (awardTemplates.length === 0) {
+    list.innerHTML = '<div class="no-template">该奖项暂无申报表，请上传</div>';
+  } else {
+    const extIcon = {xlsx:'📊',docx:'📝',pdf:'📄'};
+    list.innerHTML = awardTemplates.map(t => `
+      <div class="template-upload-item">
+        <div class="template-file-info">
+          <div class="template-file-icon">${extIcon[t.file.split('.').pop()] || '📄'}</div>
+          <div>
+            <div class="template-file-name">${t.name}</div>
+            <div class="template-file-meta">${t.file}</div>
+          </div>
+        </div>
+        <div class="template-file-actions">
+          <button class="config-btn edit" onclick="downloadAwardTemplateAdmin(${t.id})">下载</button>
+          <button class="config-btn delete" onclick="deleteAwardTemplate(${t.id})">删除</button>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+function uploadAwardTemplate(event) {
+  const awardId = document.getElementById('templateAwardSelect').value;
+  if (!awardId) {
+    showToast('请先选择奖项', 'error');
+    return;
+  }
+  
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  // 检查文件格式
+  const allowedTypes = ['.pdf', '.doc', '.docx', '.xls', '.xlsx'];
+  const fileName = file.name.toLowerCase();
+  const isValidType = allowedTypes.some(type => fileName.endsWith(type));
+  if (!isValidType) {
+    showToast('仅支持 PDF、Word、Excel 格式文件', 'error');
+    event.target.value = '';
+    return;
+  }
+  
+  if (file.size > 20 * 1024 * 1024) {
+    showToast('文件不能超过20MB', 'error');
+    return;
+  }
+  
+  // 重新加载最新数据
+  templates = JSON.parse(localStorage.getItem('templates')) || templates;
+  awards = JSON.parse(localStorage.getItem('awards')) || awards;
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const award = awards.find(a => a.id === awardId);
+    templates.push({
+      id: Date.now(),
+      name: award ? award.name + ' 申报表' : '申报表',
+      desc: '上传时间: ' + new Date().toLocaleDateString(),
+      file: file.name,
+      awardId: awardId,
+      type: 'award',
+      dataUrl: e.target.result,
+      uploadedAt: new Date().toISOString()
+    });
+    saveData();
+    loadAwardTemplates();
+    showToast('申报表上传成功');
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
+
+function downloadAwardTemplateAdmin(id) {
+  const t = templates.find(x => x.id === id);
+  if (t && t.dataUrl) {
+    const link = document.createElement('a');
+    link.href = t.dataUrl;
+    link.download = t.file;
+    link.click();
+  }
+}
+
+function deleteAwardTemplate(id) {
+  if (!confirm('确定要删除该申报表吗？')) return;
+  templates = templates.filter(t => t.id !== id);
+  saveData();
+  loadAwardTemplates();
+  showToast('申报表已删除');
+}
+
+function renderCommonTemplates() {
+  const commonTemplates = templates.filter(t => t.type === 'common');
+  const extIcon = {xlsx:'📊',docx:'📝',pdf:'📄'};
+  
+  if (commonTemplates.length === 0) {
+    document.getElementById('commonTemplateList').innerHTML = '<div class="no-template">暂无通用模版</div>';
+    return;
+  }
+  
+  document.getElementById('commonTemplateList').innerHTML = commonTemplates.map(t => `
+    <div class="template-upload-item">
+      <div class="template-file-info">
+        <div class="template-file-icon">${extIcon[t.file.split('.').pop()] || '📄'}</div>
+        <div>
+          <div class="template-file-name">${t.name}</div>
+          <div class="template-file-meta">${t.desc}</div>
+        </div>
+      </div>
+      <div class="template-file-actions">
+        <button class="config-btn edit" onclick="downloadAwardTemplateAdmin(${t.id})">下载</button>
+        <button class="config-btn delete" onclick="deleteAwardTemplate(${t.id})">删除</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ==================== 公告管理 ====================
+function renderNotices() {
+  const tagMap={notice:'通知',update:'更新',info:'资讯'};
+  const tagCls={notice:'notice',update:'update',info:'info'};
+  
+  if (noticeList.length === 0) {
+    document.getElementById('noticesList').innerHTML = '<div class="empty-state">暂无公告</div>';
+    return;
+  }
+  
+  document.getElementById('noticesList').innerHTML = noticeList.map(n => `
+    <div class="notice-item">
+      <div class="notice-header">
+        <div class="notice-title">${n.title}</div>
+        <div class="notice-actions">
+          <button class="config-btn edit" onclick="editNotice(${n.id})">编辑</button>
+          <button class="config-btn delete" onclick="deleteNotice(${n.id})">删除</button>
+        </div>
+      </div>
+      <div class="notice-content">${n.content}</div>
+      <div class="notice-footer">
+        <div class="notice-meta">发布时间: ${n.date}</div>
+        <span class="notice-type-badge ${tagCls[n.type]}">${tagMap[n.type]}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+let editingNoticeId = null;
+
+// ==================== 横幅管理 ====================
+let editingBannerId = null;
+
+function renderAdminBanners() {
+  bannerList = JSON.parse(localStorage.getItem('bannerList')) || bannerList;
+  const container = document.getElementById('adminBannersList');
+  if (!container) return;
+  
+  if (bannerList.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:#8A8A8A;">暂无横幅</div>';
+    return;
+  }
+  
+  container.innerHTML = bannerList.map(b => 
+    '<div class="admin-list-item" style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #E8E4DF;">' +
+      '<div style="flex:1;">' +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">' +
+          (b.active ? '<span style="background:#5C6B73;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">显示中</span>' : '<span style="background:#E8E4DF;color:#8A8A8A;padding:2px 8px;border-radius:4px;font-size:11px;">已隐藏</span>') +
+          '<span style="font-size:13px;font-weight:500;">' + b.title + '</span>' +
+        '</div>' +
+        '<div style="font-size:12px;color:#8A8A8A;">' + b.tag + ' · ' + b.desc + '</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:8px;">' +
+        '<button class="btn btn-secondary" style="height:32px;font-size:12px;" onclick="setBannerActive(' + b.id + ')">' + (b.active ? '取消显示' : '设为显示') + '</button>' +
+        '<button class="btn btn-secondary" style="height:32px;font-size:12px;" onclick="editBanner(' + b.id + ')">编辑</button>' +
+        '<button class="btn btn-danger" style="height:32px;font-size:12px;background:#FF6B6B;" onclick="deleteBanner(' + b.id + ')">删除</button>' +
+      '</div>' +
+    '</div>'
+  ).join('');
+}
+
+function showAddBannerModal() {
+  editingBannerId = null;
+  document.getElementById('bannerEditTitle').textContent = '添加横幅';
+  document.getElementById('bannerTag').value = '申报已开启';
+  document.getElementById('bannerEditTitle2').value = '';
+  document.getElementById('bannerEditDesc').value = '';
+  document.getElementById('bannerLinkType').value = 'apply';
+  document.getElementById('bannerActive').checked = true;
+  showModal('bannerEditModal');
+}
+
+function editBanner(id) {
+  editingBannerId = id;
+  const b = bannerList.find(x => x.id === id);
+  if (!b) return;
+  document.getElementById('bannerEditTitle').textContent = '编辑横幅';
+  document.getElementById('bannerTag').value = b.tag;
+  document.getElementById('bannerEditTitle2').value = b.title;
+  document.getElementById('bannerEditDesc').value = b.desc;
+  document.getElementById('bannerLinkType').value = b.linkType || 'apply';
+  document.getElementById('bannerActive').checked = !!b.active;
+  showModal('bannerEditModal');
+}
+
+function saveBanner() {
+  const tag = document.getElementById('bannerTag').value.trim();
+  const title = document.getElementById('bannerEditTitle2').value.trim();
+  const desc = document.getElementById('bannerEditDesc').value.trim();
+  const linkType = document.getElementById('bannerLinkType').value;
+  const active = document.getElementById('bannerActive').checked;
+  
+  if (!tag || !title || !desc) {
+    showToast('❌ 请填写完整信息', 'error');
+    return;
+  }
+  
+  if (editingBannerId) {
+    const idx = bannerList.findIndex(x => x.id === editingBannerId);
+    if (idx !== -1) {
+      bannerList[idx] = { ...bannerList[idx], tag, title, desc, linkType, active };
+    }
+  } else {
+    bannerList.push({ id: Date.now(), tag, title, desc, linkType, active });
+  }
+  
+  safeSave('bannerList', bannerList);
+  closeModal('bannerEditModal');
+  renderAdminBanners();
+  renderHomeBanner();
+  showToast('✅ 横幅已保存');
+}
+
+function deleteBanner(id) {
+  if (!confirm('确定删除此横幅？')) return;
+  bannerList = bannerList.filter(x => x.id !== id);
+  safeSave('bannerList', bannerList);
+  renderAdminBanners();
+  renderHomeBanner();
+  showToast('✅ 横幅已删除');
+}
+
+function setBannerActive(id) {
+  const b = bannerList.find(x => x.id === id);
+  if (!b) return;
+  b.active = !b.active;
+  safeSave('bannerList', bannerList);
+  renderAdminBanners();
+  renderHomeBanner();
+}
+
+function showAddNoticeModal() {
+  editingNoticeId = null;
+  document.getElementById('noticeModalTitle').textContent = '发布公告';
+  document.getElementById('noticeTitle').value = '';
+  document.getElementById('noticeType').value = 'notice';
+  document.getElementById('noticeContent').value = '';
+  showModal('noticeModal');
+}
+
+function editNotice(id) {
+  const notice = noticeList.find(n => n.id === id);
+  if (!notice) return;
+  
+  editingNoticeId = id;
+  document.getElementById('noticeModalTitle').textContent = '编辑公告';
+  document.getElementById('noticeTitle').value = notice.title;
+  document.getElementById('noticeType').value = notice.type;
+  document.getElementById('noticeContent').value = notice.content;
+  showModal('noticeModal');
+}
+
+async function saveNotice() {
+  const title = document.getElementById('noticeTitle').value.trim();
+  const type = document.getElementById('noticeType').value;
+  const content = document.getElementById('noticeContent').value.trim();
+  
+  if (!title || !content) { showToast('请填写完整信息', 'error'); return; }
+  
+  if (backendAvailable && _authToken) {
+    try {
+      if (editingNoticeId) {
+        await api.put('/notices/' + editingNoticeId, { title, content, type });
+        showToast('公告已更新');
+      } else {
+        await api.post('/notices', { title, content, type });
+        showToast('公告已发布');
+      }
+      await syncDataFromBackend();
+    } catch(e) {
+      showToast('❌ 保存失败：' + e.message, 'error');
+      return;
+    }
+  } else {
+    if (editingNoticeId) {
+      const idx = noticeList.findIndex(n => n.id == editingNoticeId);
+      if (idx !== -1) noticeList[idx] = { ...noticeList[idx], title, type, content };
+    } else {
+      noticeList.unshift({ id: Date.now(), title, type, content, date: new Date().toISOString().split('T')[0] });
+    }
+    saveData();
+    showToast(editingNoticeId ? '公告已更新' : '公告已发布');
+  }
+  
+  renderNotices();
+  renderHomeNews();
+  closeModal('noticeModal');
+}
+
+async function deleteNotice(id) {
+  if (!confirm('确定要删除该公告吗？')) return;
+  try {
+    if (backendAvailable && _authToken) {
+      await api.del('/notices/' + id);
+      await syncDataFromBackend();
+    } else {
+      noticeList = noticeList.filter(n => n.id != id);
+      saveData();
+    }
+    renderNotices();
+    renderHomeNews();
+    showToast('公告已删除');
+  } catch(e) {
+    showToast('❌ 删除失败：' + e.message, 'error');
+  }
+}
+
+// ==================== 修改记录管理 ====================
+function renderEditLogs() {
+  editLogs = JSON.parse(localStorage.getItem('editLogs')) || editLogs;
+  applications = JSON.parse(localStorage.getItem('applications')) || applications;
+  
+  const container = document.getElementById('editLogsList');
+  if (editLogs.length === 0) {
+    container.innerHTML = '<div class="empty-state">暂无修改记录</div>';
+    return;
+  }
+  
+  // 按时间倒序排列
+  const sortedLogs = [...editLogs].sort((a, b) => new Date(b.editTime) - new Date(a.editTime));
+  
+  container.innerHTML = '<table class="data-table"><thead><tr><th>序号</th><th>申报奖项</th><th>申报人</th><th>申报标题</th><th>附件数</th><th>修改时间</th><th>操作</th></tr></thead><tbody>' +
+    sortedLogs.map((log, i) => {
+      const app = applications.find(a => a.id === log.appId);
+      const currentFiles = app ? app.files : [];
+      const isDeleted = app && app.deleted;
+      const statusText = isDeleted ? '<span style="color:#C07D6F;">(已删除)</span>' : '';
+      const statusClass = isDeleted ? 'status-deleted' : '';
+      
+      return '<tr class="' + statusClass + '">' +
+        '<td>' + (i + 1) + '</td>' +
+        '<td>' + log.awardName + '</td>' +
+        '<td>' + log.userName + '</td>' +
+        '<td>' + log.oldData.title + '</td>' +
+        '<td>修改前:' + log.oldData.filesCount + ' → <span style="color:#5C6B73;font-weight:600;">' + log.newData.filesCount + '</span></td>' +
+        '<td>' + formatDateTime(log.editTime) + '</td>' +
+        '<td><button class="btn btn-secondary" style="height:28px;font-size:12px;margin-right:4px;" onclick="showAppDetailForAdmin(' + log.appId + ',\'' + log.id + '\')">查看详情</button></td>' +
+      '</tr>';
+    }).join('') +
+    '</tbody></table>';
+}
+
+// 显示申报详情弹窗（管理员查看修改记录的申报）
+function showAppDetailForAdmin(appId, editId) {
+  const app = applications.find(a => a.id == appId);
+  const log = editLogs.find(l => l.id == editId || (l.appId == appId && l.editTime));
+  
+  if (!app && !log) {
+    showToast('未找到申报记录', 'error');
+    return;
+  }
+  
+  const isDeleted = app && app.deleted;
+  const files = app ? app.files : (log ? log.oldData.files || [] : []);
+  const deletedBy = app && app.deletedBy ? users.find(u => u.id === app.deletedBy) : null;
+  
+  let html = '<div style="margin-bottom:20px;">';
+  html += '<div class="detail-section"><div class="detail-label">申报奖项</div><div class="detail-value">' + (app ? app.awardName : log.awardName) + '</div></div>';
+  html += '<div class="detail-section"><div class="detail-label">申报人</div><div class="detail-value">' + (app ? app.userName : log.userName) + '</div></div>';
+  html += '<div class="detail-section"><div class="detail-label">联系方式</div><div class="detail-value">' + (app ? app.contact || '无' : log.oldData.contact || '无') + '</div></div>';
+  html += '<div class="detail-section"><div class="detail-label">申报标题</div><div class="detail-value">' + (app ? app.title : log.oldData.title) + '</div></div>';
+  
+  if (isDeleted) {
+    html += '<div class="detail-section"><div class="detail-label">状态</div><div class="detail-value"><span style="background:#F5EBE7;color:#8B5A4A;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;">已删除</span></div></div>';
+    if (deletedBy) html += '<div class="detail-section"><div class="detail-label">删除人</div><div class="detail-value">' + deletedBy.name + '</div></div>';
+    if (app && app.deleteTime) html += '<div class="detail-section"><div class="detail-label">删除时间</div><div class="detail-value">' + formatDateTime(app.deleteTime) + '</div></div>';
+    if (app && app.deleteReason) html += '<div class="detail-section"><div class="detail-label">删除原因</div><div class="detail-value" style="color:#C07D6F;">' + app.deleteReason + '</div></div>';
+  }
+  
+  html += '</div>';
+  html += '<div class="detail-section"><div class="detail-label">📎 附件列表 (' + files.length + ')</div>';
+  html += '<div class="detail-value">';
+  
+  if (files.length === 0) {
+    html += '<span style="color:#8A8A8A;">无附件</span>';
+  } else {
+    files.forEach((f, i) => {
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(92,107,115,0.08);">';
+      html += '<div><span>📄</span> <span style="margin-left:8px;">' + f.name + '</span><span style="color:#8A8A8A;font-size:12px;margin-left:8px;">' + formatFileSize(f.size) + '</span></div>';
+      html += '<button class="btn btn-secondary" style="height:28px;font-size:12px;" onclick="downloadFileDirect(\'' + (f.dataUrl || '') + '\',\'' + f.name + '\')">下载</button>';
+      html += '</div>';
+    });
+    // 全选下载按钮
+    html += '<div style="margin-top:12px;padding-top:12px;border-top:2px dashed rgba(92,107,115,0.12);">';
+    html += '<button class="btn btn-primary" style="height:32px;font-size:13px;" onclick="downloadAllFilesFromList(' + appId + ',\'' + editId + '\')">📦 下载全部附件</button>';
+    html += '</div>';
+  }
+  
+  html += '</div></div>';
+  
+  document.getElementById('detailContent').innerHTML = html;
+  document.getElementById('auditStatus').value = 'pending';
+  document.getElementById('auditStatus').disabled = true;
+  document.getElementById('rejectReason').style.display = 'none';
+  currentDetailId = appId;
+  showModal('detailModal');
+}
+
+// 下载单个文件（不依赖应用数据）
+function downloadFileDirect(dataUrl, fileName) {
+  if (!dataUrl) {
+    showToast('文件数据不存在', 'error');
+    return;
+  }
+  const a = document.createElement('a');
+  a.href = dataUrl;
+  a.download = fileName;
+  a.click();
+}
+
+// 下载该申报的所有附件
+function downloadAllFilesFromList(appId, editId) {
+  let files = [];
+  const app = applications.find(a => a.id == appId);
+  if (app && app.files.length > 0) {
+    files = app.files;
+  } else {
+    const log = editLogs.find(l => l.id == editId || (l.appId == appId && l.editTime));
+    if (log && log.oldData && log.oldData.files) {
+      files = log.oldData.files;
+    }
+  }
+  
+  if (files.length === 0) {
+    showToast('没有附件可下载', 'error');
+    return;
+  }
+  
+  const awardName = app ? app.awardName : (editLogs.find(l => l.appId == appId)?.awardName || '未知奖项');
+  const userName = app ? app.userName : (editLogs.find(l => l.appId == appId)?.userName || '未知用户');
+  
+  files.forEach((f, i) => {
+    if (f.dataUrl) {
+      setTimeout(() => {
+        const a = document.createElement('a');
+        a.href = f.dataUrl;
+        a.download = awardName + '_' + userName + '_' + f.name;
+        a.click();
+      }, i * 300);
+    }
+  });
+  
+  showToast('开始下载 ' + files.length + ' 个附件', 'success');
+}
+
+function exportEditLogs() {
+  editLogs = JSON.parse(localStorage.getItem('editLogs')) || editLogs;
+  
+  if (editLogs.length === 0) {
+    showToast('没有可导出的修改记录', 'error');
+    return;
+  }
+  
+  const h = ['序号', '申报奖项', '修改人', '修改人ID', '原申报标题', '新申报标题', '原接口人', '新接口人', '原附件数', '新附件数', '修改时间'];
+  const rows = editLogs.map((log, i) => [
+    i + 1,
+    log.awardName,
+    log.userName,
+    log.userId,
+    log.oldData.title,
+    log.newData.title,
+    log.oldData.userName,
+    log.newData.userName,
+    log.oldData.filesCount,
+    log.newData.filesCount,
+    formatDateTime(log.editTime)
+  ]);
+  
+  let csv = '\uFEFF' + h.join(',') + '\n';
+  rows.forEach(r => { csv += r.map(c => '"' + (c || '').toString().replace(/"/g, '""') + '"').join(',') + '\n'; });
+  
+  const b = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(b);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '修改记录_' + new Date().toISOString().split('T')[0] + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('已导出 ' + editLogs.length + ' 条修改记录');
+}
+
+// 下载所有申报附件（包含已修改、已删除的）
+// 按申报人分组下载所有附件
+function downloadAllAttachments() {
+  const allApps = JSON.parse(localStorage.getItem('applications')) || [];
+  
+  // 按申报人分组收集附件
+  const filesByUser = {};
+  
+  allApps.forEach(app => {
+    const userKey = app.userName || '未知申报人';
+    if (!filesByUser[userKey]) {
+      filesByUser[userKey] = [];
+    }
+    
+    // 未删除的申报
+    if (!app.deleted && app.files) {
+      app.files.forEach(f => {
+        filesByUser[userKey].push({
+          awardName: app.awardName,
+          title: app.title,
+          status: '正常',
+          fileName: f.name,
+          fileData: f.dataUrl
+        });
+      });
+    }
+    // 已修改的申报（旧版本附件）
+    if (app.editHistory) {
+      app.editHistory.forEach(h => {
+        if (h.oldFiles) {
+          h.oldFiles.forEach(f => {
+            filesByUser[userKey].push({
+              awardName: app.awardName,
+              title: app.title,
+              status: '已修改',
+              fileName: f.name,
+              fileData: f.dataUrl
+            });
+          });
+        }
+      });
+    }
+    // 已删除的申报
+    if (app.deleted && app.files) {
+      app.files.forEach(f => {
+        filesByUser[userKey].push({
+          awardName: app.awardName,
+          title: app.title,
+          status: '已删除',
+          fileName: f.name,
+          fileData: f.dataUrl
+        });
+      });
+    }
+  });
+  
+  let totalCount = 0;
+  Object.keys(filesByUser).forEach(userName => {
+    filesByUser[userName].forEach((f, i) => {
+      setTimeout(() => {
+        if (f.fileData) {
+          const a = document.createElement('a');
+          a.href = f.fileData;
+          // 按申报人/奖项/申报标题/状态_文件名 组织
+          a.download = userName + '/' + f.awardName + '/' + f.title + '_' + f.status + '_' + f.fileName;
+          a.click();
+          totalCount++;
+        }
+      }, totalCount * 200);
+      totalCount++;
+    });
+  });
+  
+  setTimeout(() => {
+    showToast('开始下载附件，按申报人分组', 'success');
+  }, 100);
+}
+
+// ==================== 时间线管理 ====================
+function renderTimelines() {
+  const statusMap = {active: '进行中', urgent: '紧急', inactive: '未开始'};
+  const colorMap = {active: 'yellow', urgent: 'red', inactive: 'gray'};
+  
+  if (timelines.length === 0) {
+    document.getElementById('timelineList').innerHTML = '<div class="empty-state">暂无时间节点</div>';
+    return;
+  }
+  
+  document.getElementById('timelineList').innerHTML = timelines.map(t => `
+    <div class="timeline-item ${t.status}" style="margin-bottom:12px;">
+      <div class="timeline-header">
+        <div class="timeline-header-left">${t.time} - ${t.title}</div>
+        <div class="timeline-dot ${colorMap[t.status]}"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+        <span class="record-status ${t.status === 'active' ? 'active' : t.status === 'urgent' ? 'urgent' : 'inactive'}">${statusMap[t.status]}</span>
+        <div>
+          <button class="config-btn edit" onclick="editTimeline(${t.id})">编辑</button>
+          <button class="config-btn delete" onclick="deleteTimeline(${t.id})">删除</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+let editingTimelineId = null;
+
+function showAddTimelineModal() {
+  editingTimelineId = null;
+  const modal = document.getElementById('timelineModal');
+  if (!modal) {
+    // 动态创建模态框
+    const tmpl = document.createElement('div');
+    tmpl.className = 'modal-overlay';
+    tmpl.id = 'timelineModal';
+    tmpl.innerHTML = `
+      <div class="modal">
+        <div class="modal-header"><div class="modal-title" id="timelineModalTitle">添加节点</div><div class="modal-close" onclick="closeModal('timelineModal')">×</div></div>
+        <div class="modal-body">
+          <div class="form-group"><label class="form-label">时间</label><input type="text" class="form-input" id="timelineTime" placeholder="如：4月下旬"></div>
+          <div class="form-group"><label class="form-label">标题</label><input type="text" class="form-input" id="timelineTitle" placeholder="如：线安全线激励 Q2申报"></div>
+          <div class="form-group"><label class="form-label">状态</label>
+            <select class="form-select" id="timelineStatus">
+              <option value="active">进行中</option>
+              <option value="urgent">紧急</option>
+              <option value="inactive">未开始</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('timelineModal')">取消</button><button class="btn btn-primary" onclick="saveTimeline()">保存</button></div>
+      </div>
+    `;
+    document.body.appendChild(tmpl);
+  }
+  document.getElementById('timelineModalTitle').textContent = '添加节点';
+  document.getElementById('timelineTime').value = '';
+  document.getElementById('timelineTitle').value = '';
+  document.getElementById('timelineStatus').value = 'active';
+  showModal('timelineModal');
+}
+
+function editTimeline(id) {
+  const t = timelines.find(x => x.id === id);
+  if (!t) return;
+  
+  editingTimelineId = id;
+  if (!document.getElementById('timelineModal')) {
+    const tmpl = document.createElement('div');
+    tmpl.className = 'modal-overlay';
+    tmpl.id = 'timelineModal';
+    tmpl.innerHTML = `
+      <div class="modal">
+        <div class="modal-header"><div class="modal-title" id="timelineModalTitle">添加节点</div><div class="modal-close" onclick="closeModal('timelineModal')">×</div></div>
+        <div class="modal-body">
+          <div class="form-group"><label class="form-label">时间</label><input type="text" class="form-input" id="timelineTime" placeholder="如：4月下旬"></div>
+          <div class="form-group"><label class="form-label">标题</label><input type="text" class="form-input" id="timelineTitle" placeholder="如：线安全线激励 Q2申报"></div>
+          <div class="form-group"><label class="form-label">状态</label>
+            <select class="form-select" id="timelineStatus">
+              <option value="active">进行中</option>
+              <option value="urgent">紧急</option>
+              <option value="inactive">未开始</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('timelineModal')">取消</button><button class="btn btn-primary" onclick="saveTimeline()">保存</button></div>
+      </div>
+    `;
+    document.body.appendChild(tmpl);
+  }
+  
+  document.getElementById('timelineModalTitle').textContent = '编辑节点';
+  document.getElementById('timelineTime').value = t.time;
+  document.getElementById('timelineTitle').value = t.title;
+  document.getElementById('timelineStatus').value = t.status;
+  showModal('timelineModal');
+}
+
+function saveTimeline() {
+  const time = document.getElementById('timelineTime').value.trim();
+  const title = document.getElementById('timelineTitle').value.trim();
+  const status = document.getElementById('timelineStatus').value;
+  
+  if (!time || !title) {
+    showToast('请填写完整信息', 'error');
+    return;
+  }
+  
+  const colors = {active: 'yellow', urgent: 'red', inactive: 'gray'};
+  
+  if (editingTimelineId) {
+    const idx = timelines.findIndex(x => x.id === editingTimelineId);
+    if (idx !== -1) {
+      timelines[idx] = { ...timelines[idx], time, title, status, color: colors[status] };
+    }
+  } else {
+    timelines.push({
+      id: Date.now(),
+      time,
+      title,
+      status,
+      color: colors[status],
+      icon: 'star'
+    });
+  }
+  
+  saveData();
+  renderTimelines();
+  closeModal('timelineModal');
+  showToast(editingTimelineId ? '节点已更新' : '节点已添加');
+}
+
+function deleteTimeline(id) {
+  if (!confirm('确定要删除该节点吗？')) return;
+  timelines = timelines.filter(t => t.id !== id);
+  saveData();
+  renderTimelines();
+  showToast('节点已删除');
+}
+
+// ==================== 初始化 ====================
+document.addEventListener('DOMContentLoaded', async ()=>{
+  // 导航
+  document.querySelectorAll('.nav-tab[data-page]').forEach(t=>t.addEventListener('click',()=>navigateTo(t.dataset.page)));
+  
+  // 管理员面板切换
+  document.querySelectorAll('.admin-menu-item').forEach(item => {
+    item.addEventListener('click', () => {
+      if (item.dataset.adminPanel) {
+        switchAdminPanel(item.dataset.adminPanel);
+      }
+    });
+  });
+  
+  // 奖项选择变化时检查申报表
+  document.getElementById('selectAward')?.addEventListener('change', function() {
+    checkAwardTemplate(this.value);
+  });
+  
+  // 筛选器
+  ['filterAward','filterStatus','searchKeyword'].forEach(id=>{
+    document.getElementById(id)?.addEventListener('change',renderSubmissions);
+    document.getElementById(id)?.addEventListener('input',renderSubmissions);
+  });
+  
+  // 初始化规则图片上传
+  initRuleImageUpload();
+  
+  updateNavUser();
+  initUpload();
+  renderNews();
+  renderTemplates();
+  
+  // 回车登录
+  document.getElementById('loginPassword').addEventListener('keypress',e=>{if(e.key==='Enter')doLogin();});
+  document.getElementById('setPassword')?.addEventListener('keypress',e=>{if(e.key==='Enter')savePassword();});
+  document.getElementById('confirmPassword')?.addEventListener('keypress',e=>{if(e.key==='Enter')savePassword();});
+  document.getElementById('regPassword2')?.addEventListener('keypress',e=>{if(e.key==='Enter')doRegister();});
+  
+  // 检查后端并同步数据
+  await checkBackend();
+  if (backendAvailable) {
+    // 尝试用已保存的 token 恢复登录状态
+    if (_authToken && !currentUser) {
+      try {
+        const meRes = await api.get('/auth/me');
+        if (meRes.success) {
+          currentUser = { id: meRes.data.id, name: meRes.data.username, role: meRes.data.role };
+          localStorage.setItem('currentUser', JSON.stringify(currentUser));
+          updateNavUser();
+        }
+      } catch(e) {
+        _authToken = null;
+        localStorage.removeItem('authToken');
+      }
+    }
+    await syncDataFromBackend();
+    console.log('[API] 数据已从后端同步');
+  } else {
+    // 后端不可用时，从 localStorage 加载本地缓存数据
+    awards = JSON.parse(localStorage.getItem('awards')) || DEFAULT_AWARDS;
+    noticeList = JSON.parse(localStorage.getItem('noticeList')) || DEFAULT_NOTICES;
+    bannerList = JSON.parse(localStorage.getItem('bannerList')) || DEFAULT_BANNERS;
+    console.log('[API] 使用本地数据模式');
+  }
+  
+  renderAwards();
+  renderHomeBanner();
+  renderHomeStats();
+  renderHomeMyRecords();
+});
+</script>
+</body>
+</html>
