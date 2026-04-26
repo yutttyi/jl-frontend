@@ -455,10 +455,6 @@
 
 <!-- 首页 -->
 <div class="container active" id="page-home">
-  <!-- 调试：手动同步按钮 -->
-  <button onclick="manualSync()" style="position:fixed;top:70px;right:20px;z-index:999;padding:8px 16px;background:#ff6600;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:12px;">
-    🔄 同步数据
-  </button>
   <div class="home-layout">
     <!-- 左侧边栏：申报概览 + 时间轴 + 我的申报 -->
     <div class="home-left-sidebar">
@@ -1227,7 +1223,14 @@ function navigateTo(page) {
     
     // 渲染对应页面内容
     if(page==='home') { 
+      // 进入首页时自动同步最新数据
       syncDataFromBackend().then(() => {
+        renderHomeBanner(); 
+        renderHomeStats(); 
+        renderHomeMyRecords(); 
+        renderAwards(); 
+      }).catch(e => {
+        console.warn('[navigateTo] 同步失败，使用本地数据:', e.message);
         renderHomeBanner(); 
         renderHomeStats(); 
         renderHomeMyRecords(); 
@@ -1366,29 +1369,19 @@ function logout() {
   showToast('已退出登录'); 
 }
 
-// 手动同步数据（供调试按钮调用）
-async function manualSync() {
-  console.log('[手动同步] 开始同步...');
-  await syncDataFromBackend();
-  renderHomeBanner();
-  renderHomeStats();
-  renderHomeMyRecords();
-  renderAwards();
-  showToast('✅ 数据已同步');
-}
-
 // 从后端同步所有数据到本地变量
 async function syncDataFromBackend() {
-  if (!backendAvailable) return;
   try {
+    console.log('[syncDataFromBackend] 开始同步...');
     const [awardsRes, noticesRes, bannersRes] = await Promise.all([
       api.get('/awards'),
       api.get('/notices'),
       api.get('/banners'),
     ]);
     
+    console.log('[syncDataFromBackend] awardsRes:', awardsRes);
+    
     if (awardsRes.success) {
-      awards = awardsRes.data.map(a => ({
         id: String(a.id),
         name: a.name,
         desc: a.description || '',
