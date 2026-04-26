@@ -485,7 +485,7 @@
           <span id="syncStatusText">正在同步数据...</span>
           <span id="syncLastTime" style="margin-left:12px;"></span>
         </div>
-        <button onclick="manualSync()" id="syncBtn" style="padding:6px 16px;background:linear-gradient(135deg,#6B8E9F,#8CAAB9);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:12px;">🔄 刷新数据</button>
+
       </div>
       <!-- 全部奖项 -->
       <div class="section-header" style="margin-top:32px;">
@@ -1506,19 +1506,18 @@ async function syncDataFromBackend(showToastMsg = true) {
     const syncedItems = [];
     if (awardsData !== null) syncedItems.push('奖项' + awardsData + '条');
     if (noticesData !== null) syncedItems.push('公告' + noticesData + '条');
-    if (bannersData !== null) syncedItems.push('横幅' + bannersData + '条');
+    if (bannersData !== null) syncedItems.push('横幅' + bannersData.length + '条');
     
-    if (showToastMsg && syncedItems.length > 0) {
-      showToast('✅ 数据同步成功：' + syncedItems.join('、'), 'success');
-    }
+    // 同步成功后立即刷新界面
+    renderAwards();
+    renderHomeBanner();
+    renderHomeStats();
+    renderHomeMyRecords();
     
-    console.log('[syncDataFromBackend] 同步完成:', syncedItems.join('、'));
+    console.log('[syncDataFromBackend] 同步完成，已刷新界面:', syncedItems.join('、'));
   } catch(e) {
     _syncStatus.lastError = e.message;
     console.warn('[syncDataFromBackend] 同步失败:', e.message);
-    if (showToastMsg) {
-      showToast('⚠️ 数据同步失败，请检查网络后刷新页面', 'warning');
-    }
   } finally {
     _syncStatus.syncing = false;
   }
@@ -1535,9 +1534,8 @@ function startAutoSync() {
   console.log('[AutoSync] 启动定时同步，间隔:', AUTO_SYNC_INTERVAL / 1000, '秒');
   
   _autoSyncTimer = setInterval(async () => {
-    // 仅在已登录且后端可用时自动同步
-    if (!currentUser || !_authToken || !backendAvailable) {
-      console.log('[AutoSync] 跳过：未登录或后端不可用');
+    // 仅在后端可用时同步（公共数据无需登录）
+    if (!backendAvailable) {
       return;
     }
     
@@ -1561,7 +1559,7 @@ function stopAutoSync() {
 
 // 页面可见性变化时立即同步（用户从其他标签切回来时）
 document.addEventListener('visibilitychange', async () => {
-  if (document.visibilityState === 'visible' && currentUser && _authToken && backendAvailable) {
+  if (document.visibilityState === 'visible' && backendAvailable) {
     console.log('[AutoSync] 页面重新可见，立即同步...');
     try {
       await syncDataFromBackend(false);
