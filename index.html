@@ -1050,24 +1050,17 @@ const api = {
   del: (p, b) => apiRequest('DELETE', p, b),
 };
 
-// 检查后端是否可用（增加超时，避免网络延迟导致误判）
-let backendAvailable = false;
+// 检查后端是否可用
+let backendAvailable = true; // 默认使用后端模式
 async function checkBackend() {
   try {
-    // 尝试带 /api 前缀的路径
-    await fetch(API_BASE + '/health', { signal: AbortSignal.timeout(5000) });
+    const resp = await fetch(API_BASE + '/health', { signal: AbortSignal.timeout(3000) });
+    const json = await resp.json();
     backendAvailable = true;
-    console.log('[API] 后端连接成功');
+    console.log('[API] 后端正常:', json.message);
   } catch(e) {
-    // 如果失败，尝试不带 /api 前缀的路径
-    try {
-      await fetch(API_BASE.replace('/api', '') + '/api/health', { signal: AbortSignal.timeout(5000) });
-      backendAvailable = true;
-      console.log('[API] 后端连接成功（备用路径）');
-    } catch(e2) {
-      backendAvailable = false;
-      console.warn('[API] 后端不可用，使用本地数据模式');
-    }
+    backendAvailable = false;
+    console.warn('[API] 后端不可用，使用本地数据模式');
   }
 }
 
@@ -1229,7 +1222,14 @@ function navigateTo(page) {
     }
     
     // 渲染对应页面内容
-    if(page==='home') { renderHomeBanner(); renderHomeStats(); renderHomeMyRecords(); renderAwards(); }
+    if(page==='home') { 
+      syncDataFromBackend().then(() => {
+        renderHomeBanner(); 
+        renderHomeStats(); 
+        renderHomeMyRecords(); 
+        renderAwards(); 
+      });
+    }
     if(page==='apply') { renderMyRecords(); updateAwardSelect(); }
     // news 页面已移除
     if(page==='templates') renderTemplates();
