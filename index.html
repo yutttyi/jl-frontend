@@ -455,6 +455,10 @@
 
 <!-- 首页 -->
 <div class="container active" id="page-home">
+  <!-- 调试：手动同步按钮 -->
+  <button onclick="manualSync()" style="position:fixed;top:70px;right:20px;z-index:999;padding:8px 16px;background:#ff6600;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:12px;">
+    🔄 同步数据
+  </button>
   <div class="home-layout">
     <!-- 左侧边栏：申报概览 + 时间轴 + 我的申报 -->
     <div class="home-left-sidebar">
@@ -1360,6 +1364,17 @@ function logout() {
   updateNavUser();
   navigateTo('home');
   showToast('已退出登录'); 
+}
+
+// 手动同步数据（供调试按钮调用）
+async function manualSync() {
+  console.log('[手动同步] 开始同步...');
+  await syncDataFromBackend();
+  renderHomeBanner();
+  renderHomeStats();
+  renderHomeMyRecords();
+  renderAwards();
+  showToast('✅ 数据已同步');
 }
 
 // 从后端同步所有数据到本地变量
