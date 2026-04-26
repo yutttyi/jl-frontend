@@ -1382,6 +1382,7 @@ async function syncDataFromBackend() {
     console.log('[syncDataFromBackend] awardsRes:', awardsRes);
     
     if (awardsRes.success) {
+      awards = awardsRes.data.map(a => ({
         id: String(a.id),
         name: a.name,
         desc: a.description || '',
