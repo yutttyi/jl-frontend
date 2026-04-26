@@ -4220,31 +4220,33 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   document.getElementById('confirmPassword')?.addEventListener('keypress',e=>{if(e.key==='Enter')savePassword();});
   document.getElementById('regPassword2')?.addEventListener('keypress',e=>{if(e.key==='Enter')doRegister();});
   
-  // 检查后端并同步数据
-  await checkBackend();
-  if (backendAvailable) {
-    // 尝试用已保存的 token 恢复登录状态
-    if (_authToken && !currentUser) {
-      try {
-        const meRes = await api.get('/auth/me');
-        if (meRes.success) {
-          currentUser = { id: meRes.data.id, name: meRes.data.username, role: meRes.data.role };
-          localStorage.setItem('currentUser', JSON.stringify(currentUser));
-          updateNavUser();
-        }
-      } catch(e) {
-        _authToken = null;
-        localStorage.removeItem('authToken');
+  // 默认使用后端模式，失败时降级到本地
+  backendAvailable = true;
+  
+  // 尝试用已保存的 token 恢复登录状态
+  if (_authToken && !currentUser) {
+    try {
+      const meRes = await api.get('/auth/me');
+      if (meRes.success) {
+        currentUser = { id: meRes.data.id, name: meRes.data.username, role: meRes.data.role };
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        updateNavUser();
       }
+    } catch(e) {
+      _authToken = null;
+      localStorage.removeItem('authToken');
     }
+  }
+  
+  // 尝试从后端同步数据
+  try {
     await syncDataFromBackend();
     console.log('[API] 数据已从后端同步');
-  } else {
-    // 后端不可用时，从 localStorage 加载本地缓存数据
+  } catch(e) {
+    console.warn('[API] 后端同步失败，使用本地数据:', e.message);
     awards = JSON.parse(localStorage.getItem('awards')) || DEFAULT_AWARDS;
     noticeList = JSON.parse(localStorage.getItem('noticeList')) || DEFAULT_NOTICES;
     bannerList = JSON.parse(localStorage.getItem('bannerList')) || DEFAULT_BANNERS;
-    console.log('[API] 使用本地数据模式');
   }
   
   renderAwards();
