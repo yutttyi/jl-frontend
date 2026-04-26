@@ -479,6 +479,14 @@
           <div class="banner-btn" id="bannerBtn">立即申报 →</div>
         </div>
       </div>
+      <!-- 数据同步状态栏 -->
+      <div class="sync-status-bar" id="syncStatusBar" style="display:none;margin:16px auto;max-width:900px;padding:12px 20px;background:linear-gradient(135deg,#f8f9fa,#e9ecef);border-radius:12px;border:1px solid #dee2e6;display:flex;align-items:center;justify-content:space-between;font-size:13px;color:#6c757d;">
+        <div>
+          <span id="syncStatusText">正在同步数据...</span>
+          <span id="syncLastTime" style="margin-left:12px;"></span>
+        </div>
+        <button onclick="manualSync()" id="syncBtn" style="padding:6px 16px;background:linear-gradient(135deg,#6B8E9F,#8CAAB9);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:12px;">🔄 刷新数据</button>
+      </div>
       <!-- 全部奖项 -->
       <div class="section-header" style="margin-top:32px;">
         <div class="section-title">🏅 全部奖项</div>
@@ -1036,11 +1044,29 @@ let _authToken = localStorage.getItem('authToken') || null;
 async function apiRequest(method, path, body) {
   const headers = { 'Content-Type': 'application/json' };
   if (_authToken) headers['Authorization'] = 'Bearer ' + _authToken;
-  const opts = { method, headers };
+  const opts = { 
+    method, 
+    headers,
+    cache: 'no-store'  // 禁用缓存，确保获取最新数据
+  };
   if (body) opts.body = JSON.stringify(body);
-  const resp = await fetch(API_BASE + path, opts);
-  const json = await resp.json();
-  if (!resp.ok) throw new Error(json.message || '请求失败');
+  
+  // 添加时间戳参数，强制绕过浏览器缓存
+  const sep = path.includes('?') ? '&' : '?';
+  const url = API_BASE + path + sep + '_t=' + Date.now();
+  
+  const resp = await fetch(url, opts);
+  
+  // 尝试解析 JSON，失败则返回错误信息
+  let json;
+  try {
+    json = await resp.json();
+  } catch (e) {
+    const text = await resp.text().catch(() => '无法读取响应');
+    throw new Error('服务器返回格式错误: ' + (text.substring(0, 100) || resp.statusText));
+  }
+  
+  if (!resp.ok) throw new Error(json.message || ('HTTP ' + resp.status));
   return json;
 }
 const api = {
@@ -1279,6 +1305,7 @@ async function doLogin() {
       showToast('登录成功');
       // 登录后从后端同步数据
       await syncDataFromBackend();
+      startAutoSync(); // 确保定时同步运行
       navigateTo('home');
       return;
     } catch(err) {
@@ -1364,88 +1391,186 @@ function logout() {
   _authToken=null;
   localStorage.removeItem('currentUser');
   localStorage.removeItem('authToken');
+  stopAutoSync(); // 登出时停止定时同步
   updateNavUser();
   navigateTo('home');
   showToast('已退出登录'); 
 }
 
 // 从后端同步所有数据到本地变量
-async function syncDataFromBackend() {
+let _syncStatus = { syncing: false, lastSync: null, lastError: null };
+
+async function syncDataFromBackend(showToastMsg = true) {
+  if (_syncStatus.syncing) {
+    console.log('[syncDataFromBackend] 同步已在进行中，跳过');
+    return;
+  }
+  _syncStatus.syncing = true;
+  
   try {
     console.log('[syncDataFromBackend] 开始同步...');
-    const [awardsRes, noticesRes, bannersRes] = await Promise.all([
-      api.get('/awards'),
-      api.get('/notices'),
-      api.get('/banners'),
-    ]);
     
-    console.log('[syncDataFromBackend] awardsRes:', awardsRes);
+    // 分别请求每个数据源，避免一个失败影响全部
+    let awardsData = null, noticesData = null, bannersData = null;
     
-    if (awardsRes.success) {
-      awards = awardsRes.data.map(a => ({
-        id: String(a.id),
-        name: a.name,
-        desc: a.description || '',
-        status: a.status === 'active' ? 'active' : (a.status === 'closed' ? 'closed' : 'pending'),
-        deadline: a.deadline ? a.deadline.substring(0,10) : '',
-        icon: a.icon || 'star',
-        rule: a.rule || '',
-        ruleImages: a.rule_images ? JSON.parse(a.rule_images) : [],
-        direction: '',
-        method: '',
-      }));
-      localStorage.setItem('awards', JSON.stringify(awards));
+    // 同步奖项
+    try {
+      const awardsRes = await api.get('/awards');
+      if (awardsRes.success && awardsRes.data) {
+        awards = awardsRes.data.map(a => ({
+          id: String(a.id),
+          name: a.name,
+          desc: a.description || '',
+          status: a.status === 'active' ? 'active' : (a.status === 'closed' ? 'closed' : 'pending'),
+          deadline: a.deadline ? a.deadline.substring(0,10) : '',
+          icon: a.icon || 'star',
+          rule: a.rule || '',
+          ruleImages: a.rule_images ? (typeof a.rule_images === 'string' ? JSON.parse(a.rule_images) : a.rule_images) : [],
+          direction: '',
+          method: '',
+        }));
+        localStorage.setItem('awards', JSON.stringify(awards));
+        awardsData = awards.length;
+      }
+    } catch(e) {
+      console.warn('[syncDataFromBackend] 奖项同步失败:', e.message);
     }
     
-    if (noticesRes.success) {
-      noticeList = noticesRes.data.map(n => ({
-        id: n.id,
-        title: n.title,
-        content: n.content || '',
-        tag: n.type || 'notice',
-        date: n.created_at ? n.created_at.substring(0,10) : new Date().toISOString().substring(0,10),
-      }));
-      localStorage.setItem('noticeList', JSON.stringify(noticeList));
+    // 同步公告
+    try {
+      const noticesRes = await api.get('/notices');
+      if (noticesRes.success && noticesRes.data) {
+        noticeList = noticesRes.data.map(n => ({
+          id: n.id,
+          title: n.title,
+          content: n.content || '',
+          tag: n.type || 'notice',
+          date: n.created_at ? n.created_at.substring(0,10) : new Date().toISOString().substring(0,10),
+        }));
+        localStorage.setItem('noticeList', JSON.stringify(noticeList));
+        noticesData = noticeList.length;
+      }
+    } catch(e) {
+      console.warn('[syncDataFromBackend] 公告同步失败:', e.message);
     }
     
-    if (bannersRes.success) {
-      bannerList = bannersRes.data.map(b => ({
-        id: b.id,
-        tag: b.tag || '申报已开启',
-        title: b.title,
-        desc: b.description || '',
-        linkType: b.link || 'apply',
-        active: b.status === 'active',
-      }));
-      localStorage.setItem('bannerList', JSON.stringify(bannerList));
+    // 同步横幅
+    try {
+      const bannersRes = await api.get('/banners');
+      if (bannersRes.success && bannersRes.data) {
+        bannerList = bannersRes.data.map(b => ({
+          id: b.id,
+          tag: b.tag || '申报已开启',
+          title: b.title,
+          desc: b.description || '',
+          linkType: b.link || 'apply',
+          active: b.status === 'active',
+        }));
+        localStorage.setItem('bannerList', JSON.stringify(bannerList));
+        bannersData = bannerList.length;
+      }
+    } catch(e) {
+      console.warn('[syncDataFromBackend] 横幅同步失败:', e.message);
     }
     
     // 如果已登录，同步申报数据
     if (currentUser && _authToken) {
-      const appsRes = await api.get('/applications');
-      if (appsRes.success) {
-        applications = appsRes.data.map(a => ({
-          id: a.id,
-          awardId: String(a.award_id),
-          awardName: a.award_name || '',
-          userId: a.user_id,
-          userName: a.username || '',
-          contactName: a.contact_name || '',
-          title: a.project_name || '',
-          sortOrder: a.sort_order || 0,
-          status: a.status || 'pending',
-          reviewComment: a.review_comment || '',
-          files: a.attachments ? JSON.parse(a.attachments) : [],
-          createdAt: a.created_at || new Date().toISOString(),
-          deleted: a.deleted === 1,
-        }));
-        localStorage.setItem('applications', JSON.stringify(applications));
+      try {
+        const appsRes = await api.get('/applications');
+        if (appsRes.success && appsRes.data) {
+          applications = appsRes.data.map(a => ({
+            id: a.id,
+            awardId: String(a.award_id),
+            awardName: a.award_name || '',
+            userId: a.user_id,
+            userName: a.username || '',
+            contactName: a.contact_name || '',
+            title: a.project_name || '',
+            sortOrder: a.sort_order || 0,
+            status: a.status || 'pending',
+            reviewComment: a.review_comment || '',
+            files: a.attachments ? (typeof a.attachments === 'string' ? JSON.parse(a.attachments) : a.attachments) : [],
+            createdAt: a.created_at || new Date().toISOString(),
+            deleted: a.deleted === 1,
+          }));
+          localStorage.setItem('applications', JSON.stringify(applications));
+        }
+      } catch(e) {
+        console.warn('[syncDataFromBackend] 申报同步失败:', e.message);
       }
     }
+    
+    _syncStatus.lastSync = new Date();
+    _syncStatus.lastError = null;
+    
+    const syncedItems = [];
+    if (awardsData !== null) syncedItems.push('奖项' + awardsData + '条');
+    if (noticesData !== null) syncedItems.push('公告' + noticesData + '条');
+    if (bannersData !== null) syncedItems.push('横幅' + bannersData + '条');
+    
+    if (showToastMsg && syncedItems.length > 0) {
+      showToast('✅ 数据同步成功：' + syncedItems.join('、'), 'success');
+    }
+    
+    console.log('[syncDataFromBackend] 同步完成:', syncedItems.join('、'));
   } catch(e) {
+    _syncStatus.lastError = e.message;
     console.warn('[syncDataFromBackend] 同步失败:', e.message);
+    if (showToastMsg) {
+      showToast('⚠️ 数据同步失败，请检查网络后刷新页面', 'warning');
+    }
+  } finally {
+    _syncStatus.syncing = false;
+    updateSyncStatusUI();
   }
 }
+
+// ==================== 定时自动同步 ====================
+let _autoSyncTimer = null;
+const AUTO_SYNC_INTERVAL = 30000; // 30秒自动同步一次
+
+// 启动定时自动同步
+function startAutoSync() {
+  if (_autoSyncTimer) return; // 避免重复启动
+  
+  console.log('[AutoSync] 启动定时同步，间隔:', AUTO_SYNC_INTERVAL / 1000, '秒');
+  
+  _autoSyncTimer = setInterval(async () => {
+    // 仅在已登录且后端可用时自动同步
+    if (!currentUser || !_authToken || !backendAvailable) {
+      console.log('[AutoSync] 跳过：未登录或后端不可用');
+      return;
+    }
+    
+    console.log('[AutoSync] 定时触发数据同步...');
+    try {
+      await syncDataFromBackend(false); // 静默同步，不显示 toast
+    } catch(e) {
+      console.warn('[AutoSync] 定时同步失败:', e.message);
+    }
+  }, AUTO_SYNC_INTERVAL);
+}
+
+// 停止定时自动同步
+function stopAutoSync() {
+  if (_autoSyncTimer) {
+    clearInterval(_autoSyncTimer);
+    _autoSyncTimer = null;
+    console.log('[AutoSync] 定时同步已停止');
+  }
+}
+
+// 页面可见性变化时立即同步（用户从其他标签切回来时）
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState === 'visible' && currentUser && _authToken && backendAvailable) {
+    console.log('[AutoSync] 页面重新可见，立即同步...');
+    try {
+      await syncDataFromBackend(false);
+    } catch(e) {
+      console.warn('[AutoSync] 可见性切换同步失败:', e.message);
+    }
+  }
+});
 
 // ==================== 用户注册 ====================
 function showRegisterModal() {
@@ -4253,6 +4378,10 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   renderHomeBanner();
   renderHomeStats();
   renderHomeMyRecords();
+  
+  // 启动定时自动同步
+  startAutoSync();
+  console.log('[Init] 定时自动同步已启动');
 });
 </script>
 </body>
