@@ -1,0 +1,16 @@
+# Netlify 配置
+[build]
+  publish = "."
+
+# 所有路由都返回 index.html（SPA）
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# 安全头
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
