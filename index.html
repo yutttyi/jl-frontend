@@ -479,14 +479,6 @@
           <div class="banner-btn" id="bannerBtn">立即申报 →</div>
         </div>
       </div>
-      <!-- 数据同步状态栏 -->
-      <div class="sync-status-bar" id="syncStatusBar" style="display:none;margin:16px auto;max-width:900px;padding:12px 20px;background:linear-gradient(135deg,#f8f9fa,#e9ecef);border-radius:12px;border:1px solid #dee2e6;display:flex;align-items:center;justify-content:space-between;font-size:13px;color:#6c757d;">
-        <div>
-          <span id="syncStatusText">正在同步数据...</span>
-          <span id="syncLastTime" style="margin-left:12px;"></span>
-        </div>
-
-      </div>
       <!-- 全部奖项 -->
       <div class="section-header" style="margin-top:32px;">
         <div class="section-title">🏅 全部奖项</div>
@@ -1505,6 +1497,55 @@ async function syncDataFromBackend(showToastMsg = true) {
       }
     }
     
+    // 同步时间轴
+    try {
+      const timelinesRes = await api.get('/timelines');
+      console.log('[syncDataFromBackend] /timelines 响应:', JSON.stringify(timelinesRes).substring(0, 300));
+      if (timelinesRes.success && timelinesRes.data && timelinesRes.data.length > 0) {
+        timelines = timelinesRes.data.map(t => ({
+          id: t.id,
+          time: t.time || '',
+          icon: t.icon || 'clock',
+          title: t.title || '',
+          status: t.status || 'inactive',
+          color: t.color || 'gray',
+        }));
+        localStorage.setItem('timelines', JSON.stringify(timelines));
+        console.log('[syncDataFromBackend] 时间轴已更新:', timelines.length, '条');
+      }
+    } catch(e) {
+      console.warn('[syncDataFromBackend] 时间轴同步失败（可能后端暂无此接口）:', e.message);
+      // 后端没有时间轴接口时，使用本地默认数据
+      if (timelines.length === 0) {
+        timelines = DEFAULT_TIMELINES;
+        localStorage.setItem('timelines', JSON.stringify(DEFAULT_TIMELINES));
+      }
+    }
+    
+    // 同步模板
+    try {
+      const templatesRes = await api.get('/templates');
+      if (templatesRes.success && templatesRes.data && templatesRes.data.length > 0) {
+        templates = templatesRes.data.map(t => ({
+          id: t.id,
+          name: t.name || '',
+          desc: t.description || t.desc || '',
+          file: t.file_name || t.file || '',
+          awardId: String(t.award_id || t.awardId || ''),
+          type: t.type || 'award',
+        }));
+        localStorage.setItem('templates', JSON.stringify(templates));
+        console.log('[syncDataFromBackend] 模板已更新:', templates.length, '条');
+      }
+    } catch(e) {
+      console.warn('[syncDataFromBackend] 模板同步失败（可能后端暂无此接口）:', e.message);
+      // 后端没有模板接口时，使用本地默认数据
+      if (templates.length === 0) {
+        templates = DEFAULT_TEMPLATES;
+        localStorage.setItem('templates', JSON.stringify(DEFAULT_TEMPLATES));
+      }
+    }
+    
     _syncStatus.lastSync = new Date();
     _syncStatus.lastError = null;
     
@@ -1512,6 +1553,8 @@ async function syncDataFromBackend(showToastMsg = true) {
     if (awardsData !== null) syncedItems.push('奖项' + awardsData + '条');
     if (noticesData !== null) syncedItems.push('公告' + noticesData + '条');
     if (bannerList.length > 0) syncedItems.push('横幅' + bannerList.length + '条');
+    if (timelines.length > 0) syncedItems.push('时间轴' + timelines.length + '条');
+    if (templates.length > 0) syncedItems.push('模板' + templates.length + '条');
     
     // 同步成功后立即刷新界面
     console.log('[syncDataFromBackend] 刷新界面... awards:', awards.length, 'banners:', bannerList.length, 'noticeList:', noticeList.length);
@@ -1521,6 +1564,9 @@ async function syncDataFromBackend(showToastMsg = true) {
     try { renderHomeMyRecords(); } catch(e) { console.error('[sync] renderHomeMyRecords 失败:', e); }
     try { renderHomeNews(); } catch(e) { console.error('[sync] renderHomeNews 失败:', e); }
     try { renderNews(); } catch(e) { console.error('[sync] renderNews 失败:', e); }
+    try { renderTimelines(); } catch(e) { console.error('[sync] renderTimelines 失败:', e); }
+    try { renderTemplates(); } catch(e) { console.error('[sync] renderTemplates 失败:', e); }
+    try { renderHomeTimeline(); } catch(e) { console.error('[sync] renderHomeTimeline 失败:', e); }
     
     console.log('[syncDataFromBackend] 同步完成，已刷新界面:', syncedItems.join('、'));
   } catch(e) {
