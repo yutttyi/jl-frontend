@@ -1976,64 +1976,31 @@ function goToApply(id) {
 
 // ==================== 激励速递 ====================
 function renderNews() {
-  // 数据已在initData()中加载，此处不再重复加载
+  // 只渲染公告列表到 homeNewsList（奖项由 renderAwards() 负责渲染）
   
   const tagMap={notice:'通知',update:'更新',info:'资讯'},tagCls={notice:'notice',update:'update',info:'info'};
   
-  // 构建奖项卡片HTML（按紧急程度排序）
-  let awardsHtml = '<div style="margin-bottom:32px;"><div style="font-size:18px;font-weight:500;color:#2D2D2D;margin-bottom:16px;">🏅 奖项激励规则</div><div class="awards-grid">';
-  
-  // 按紧急程度排序
-  const sortedAwards = [...awards].sort((a, b) => {
-    return getAwardUrgency(a) - getAwardUrgency(b);
-  });
-  
-  sortedAwards.forEach(a => {
-    const urgency = getAwardUrgency(a);
-    const sc = urgency === 0 ? 'urgent' : a.status === 'pending' ? 'active' : a.status === 'active' ? 'warnings' : 'inactive';
-    const st = urgency === 0 ? '紧急' : a.status === 'active' ? '进行中' : a.status === 'pending' ? '未开始' : '已结束';
-    const icon = iconEmoji[a.icon] || '⭐';
-    const hasRule = a.ruleImage ? '📷' : '';
-    // 统一调用showAwardDetail展示完整详情
-    const ruleBtn = '<button class="btn btn-primary" style="height:32px;font-size:12px;margin-top:8px;" onclick="event.stopPropagation();showAwardDetail(\'' + a.id + '\')">' + (a.ruleImage ? '查看详情' : '查看详情') + '</button>';
-    
-    awardsHtml += '<div class="award-card" onclick="showAwardDetail(\'' + a.id + '\')">' +
-      '<div class="award-header">' +
-        '<div class="award-icon ' + a.icon + '">' + icon + '</div>' +
-        '<div class="award-status ' + sc + '"><span class="dot"></span>' + st + '</div>' +
-      '</div>' +
-      '<div class="award-name">' + a.name + ' ' + hasRule + '</div>' +
-      '<div class="award-desc">' + a.desc + '</div>' +
-      '<div style="font-size:12px;color:#5C6B73;margin-bottom:8px;">激励导向：' + a.direction + '</div>' +
-      ruleBtn +
-    '</div>';
-  });
-  
-  awardsHtml += '</div></div>';
-  
   // 构建公告列表HTML
-  let noticesHtml = '<div><div style="font-size:18px;font-weight:500;color:#2D2D2D;margin-bottom:16px;">📢 最新公告</div>';
+  let noticesHtml = '';
   
   if (noticeList.length === 0) {
-    noticesHtml += '<div class="empty-state">暂无公告</div>';
+    noticesHtml = '<div class="empty-state">暂无公告</div>';
   } else {
     noticeList.forEach(n => {
       const tagName = tagMap[n.type] || '资讯';
       const tagClass = tagCls[n.type] || 'info';
-      noticesHtml += '<div class="news-item">' +
+      noticesHtml += '<div class="news-item" onclick="showNoticeDetail(' + n.id + ')">' +
         '<div class="news-meta">' +
           '<span class="news-tag ' + tagClass + '">' + tagName + '</span>' +
-          '<span class="news-date">' + n.date + '</span>' +
+          '<span class="news-date">' + (n.date || '') + '</span>' +
         '</div>' +
         '<div class="news-title">' + n.title + '</div>' +
-        '<div class="news-summary">' + n.content + '</div>' +
+        '<div class="news-summary">' + (n.content || '').substring(0, 100) + '...</div>' +
       '</div>';
     });
   }
   
-  noticesHtml += '</div>';
-  
-  document.getElementById('homeNewsList').innerHTML = awardsHtml + noticesHtml;
+  document.getElementById('homeNewsList').innerHTML = noticesHtml;
 }
 
 // 显示奖项激励规则
@@ -3694,9 +3661,9 @@ function uploadAwardTemplate(event) {
   awards = JSON.parse(localStorage.getItem('awards')) || awards;
   
   const reader = new FileReader();
-  reader.onload = function(e) {
+  reader.onload = async function(e) {
     const award = awards.find(a => a.id === awardId);
-    templates.push({
+    const newTemplate = {
       id: Date.now(),
       name: award ? award.name + ' 申报表' : '申报表',
       desc: '上传时间: ' + new Date().toLocaleDateString(),
@@ -3705,7 +3672,44 @@ function uploadAwardTemplate(event) {
       type: 'award',
       dataUrl: e.target.result,
       uploadedAt: new Date().toISOString()
-    });
+    };
+    
+    // 尝试同步到后端
+    if (_authToken && backendAvailable) {
+      try {
+        // 先上传文件获取URL
+        let fileUrl = '';
+        if (file.size < 10 * 1024 * 1024) { // 小于10MB直接上传
+          const formData = new FormData();
+          formData.append('files', file);
+          const uploadRes = await fetch(API_BASE + '/upload', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + _authToken },
+            body: formData
+          });
+          const uploadData = await uploadRes.json();
+          if (uploadData.success && uploadData.data?.[0]) {
+            fileUrl = uploadData.data[0].url;
+          }
+        }
+        
+        // 创建模板记录
+        await api.post('/templates', {
+          name: newTemplate.name,
+          description: newTemplate.desc,
+          file_name: file.name,
+          award_id: awardId,
+          type: 'award',
+          file_url: fileUrl || ''
+        });
+        console.log('[uploadAwardTemplate] 已同步到后端');
+      } catch(err) {
+        console.warn('[uploadAwardTemplate] 后端同步失败:', err.message);
+      }
+    }
+    
+    // 本地也保存
+    templates.push(newTemplate);
     saveData();
     loadAwardTemplates();
     showToast('申报表上传成功');
@@ -3724,8 +3728,19 @@ function downloadAwardTemplateAdmin(id) {
   }
 }
 
-function deleteAwardTemplate(id) {
+async function deleteAwardTemplate(id) {
   if (!confirm('确定要删除该申报表吗？')) return;
+  
+  // 同步到后端
+  if (_authToken && backendAvailable) {
+    try {
+      await api.del('/templates/' + id);
+      console.log('[deleteAwardTemplate] 已从后端删除');
+    } catch(e) {
+      console.warn('[deleteAwardTemplate] 后端删除失败:', e.message);
+    }
+  }
+  
   templates = templates.filter(t => t.id !== id);
   saveData();
   loadAwardTemplates();
