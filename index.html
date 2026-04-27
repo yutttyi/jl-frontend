@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>激励奖项平台</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
   <!-- 字体：使用系统字体栈 -->
   <style>
     :root {
@@ -4343,7 +4344,7 @@ function editTimeline(id) {
   showModal('timelineModal');
 }
 
-function saveTimeline() {
+async function saveTimeline() {
   const time = document.getElementById('timelineTime').value.trim();
   const title = document.getElementById('timelineTitle').value.trim();
   const status = document.getElementById('timelineStatus').value;
@@ -4355,6 +4356,22 @@ function saveTimeline() {
   
   const colors = {active: 'yellow', urgent: 'red', inactive: 'gray'};
   
+  // 尝试同步到后端
+  if (_authToken && backendAvailable) {
+    try {
+      if (editingTimelineId && String(editingTimelineId) !== String(Date.now())) {
+        await api.put('/timelines/' + editingTimelineId, { time, title, status, color: colors[status] });
+        console.log('[saveTimeline] 已更新到后端:', editingTimelineId);
+      } else {
+        await api.post('/timelines', { time, title, status, color: colors[status], icon: 'clock' });
+        console.log('[saveTimeline] 已创建到后端');
+      }
+    } catch(e) {
+      console.warn('[saveTimeline] 后端同步失败，仅保存本地:', e.message);
+    }
+  }
+  
+  // 本地也更新
   if (editingTimelineId) {
     const idx = timelines.findIndex(x => x.id === editingTimelineId);
     if (idx !== -1) {
@@ -4367,7 +4384,7 @@ function saveTimeline() {
       title,
       status,
       color: colors[status],
-      icon: 'star'
+      icon: 'clock'
     });
   }
   
@@ -4377,8 +4394,19 @@ function saveTimeline() {
   showToast(editingTimelineId ? '节点已更新' : '节点已添加');
 }
 
-function deleteTimeline(id) {
+async function deleteTimeline(id) {
   if (!confirm('确定要删除该节点吗？')) return;
+  
+  // 同步到后端
+  if (_authToken && backendAvailable) {
+    try {
+      await api.del('/timelines/' + id);
+      console.log('[deleteTimeline] 已从后端删除');
+    } catch(e) {
+      console.warn('[deleteTimeline] 后端删除失败:', e.message);
+    }
+  }
+  
   timelines = timelines.filter(t => t.id !== id);
   saveData();
   renderTimelines();
