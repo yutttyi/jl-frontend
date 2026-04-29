@@ -2083,7 +2083,14 @@ function showApplicationDetail(appId) {
   // 申报信息
   contentHtml += '<div style="margin-bottom:16px;"><div style="font-size:14px;color:#8A8A8A;margin-bottom:4px;">奖项名称</div><div style="font-size:16px;font-weight:600;color:#2D2D2D;">' + app.awardName + '</div></div>';
   contentHtml += '<div style="margin-bottom:16px;"><div style="font-size:14px;color:#8A8A8A;margin-bottom:4px;">申报项目</div><div style="font-size:16px;font-weight:600;color:#2D2D2D;">' + app.title + '</div></div>';
-  contentHtml += '<div style="margin-bottom:16px;"><div style="font-size:14px;color:#8A8A8A;margin-bottom:4px;">接口人</div><div style="font-size:14px;color:#2D2D2D;">' + app.userName + '</div></div>';
+  // 申报人(登录账号)
+  contentHtml += '<div style="margin-bottom:16px;"><div style="font-size:14px;color:#8A8A8A;margin-bottom:4px;">申报人</div><div style="font-size:14px;color:#2D2D2D;">' + (app.userName || '-') + '</div></div>';
+  // 接口人(表单填写)，与申报人不同时才显示
+  if (app.contactName && app.contactName !== app.userName) {
+    contentHtml += '<div style="margin-bottom:16px;"><div style="font-size:14px;color:#8A8A8A;margin-bottom:4px;">接口人</div><div style="font-size:14px;color:#2D2D2D;">' + app.contactName + '</div></div>';
+  } else {
+    contentHtml += '<div style="margin-bottom:16px;"><div style="font-size:14px;color:#8A8A8A;margin-bottom:4px;">接口人</div><div style="font-size:14px;color:#2D2D2D;">' + (app.contactName || app.userName || '-') + '</div></div>';
+  }
   contentHtml += '<div style="margin-bottom:16px;"><div style="font-size:14px;color:#8A8A8A;margin-bottom:8px;">审核状态</div><span style="' + statusStyle[st] + 'font-size:14px;font-weight:600;">' + statusMap[st] + '</span></div>';
   
   // 如果被驳回，显示驳回原因
@@ -3243,6 +3250,26 @@ function updateFilterOptions(){
 
 // 批量选择相关变量
 let selectedSubmissionIds = new Set();
+// 申报修改历史计数缓存（管理员用）
+let _appHistoryCounts = null;
+
+// 获取所有申报的修改历史计数（管理员列表标记用）
+async function fetchHistoryCounts() {
+  try {
+    if (!backendAvailable || !_authToken || !currentUser || currentUser.role !== 'admin') return;
+    const res = await api.get('/applications/history-counts');
+    if (res.success && res.data) {
+      _appHistoryCounts = {};
+      res.data.forEach(item => {
+        _appHistoryCounts[String(item.application_id)] = item.version_count;
+      });
+      // 重新渲染列表以显示标记
+      renderSubmissions();
+    }
+  } catch (e) {
+    console.warn('[fetchHistoryCounts] 获取失败:', e.message);
+  }
+}
 
 function renderSubmissions() {
   const fa=document.getElementById('filterAward').value,fs=document.getElementById('filterStatus').value,sk=document.getElementById('searchKeyword').value.toLowerCase();
@@ -3258,11 +3285,19 @@ function renderSubmissions() {
   document.getElementById('submissionsTable').innerHTML=f.length===0?'<tr><td colspan="9" class="empty-state">暂无申报记录</td></tr>':f.map(a=>{
     const safeSt = safeStatus(a.status);
     const checked = selectedSubmissionIds.has(a.id) ? 'checked' : '';
+    // 检测是否有修改历史（updated_at 与创建时间不同，或已缓存了历史计数）
+    const hasHistory = _appHistoryCounts && _appHistoryCounts[String(a.id)];
+    const editedBadge = hasHistory ? '<span style="background:#E8F4FD;color:#2E86AB;font-size:10px;padding:1px 6px;border-radius:4px;margin-left:4px;vertical-align:middle;">已编辑' + (hasHistory > 1 ? '×'+hasHistory : '') + '</span>' : '';
     return `<tr style="${a.deleted ? 'opacity:0.5;' : ''}">
       <td><input type="checkbox" ${checked} onchange="toggleSubmissionSelection(${a.id})" style="cursor:pointer;"></td>
-      <td><div style="font-weight:500;">${a.userName}</div><div style="font-size:11px;color:#8A8A8A;">${a.dept||''}</div></td>
-      <td>${a.awardName}</td><td>${a.title}</td><td>${a.files.length}个附件</td><td>${formatDateTime(a.submitTime)}</td><td><span class="record-status ${sc[safeSt]}">${sm[safeSt]}</span></td><td class="actions"><button class="action-btn view-btn" onclick="viewApplication(${a.id})">查看</button></td></tr>`;
+      <td><div style="font-weight:500;">${a.userName || '-'}</div>${(a.contactName && a.contactName !== a.userName) ? '<div style="font-size:11px;color:#8A8A8A;">接口人：' + a.contactName + '</div>' : ''}</td>
+      <td>${a.awardName||''}</td><td>${a.title||''}${editedBadge}</td><td>${a.files?a.files.length:0}个附件</td><td>${formatDateTime(a.submitTime)}</td><td><span class="record-status ${sc[safeSt]}">${sm[safeSt]}</span></td><td class="actions"><button class="action-btn view-btn" onclick="viewApplication(${a.id})">查看</button></td></tr>`;
   }).join('');
+  
+  // 管理员页面加载时获取修改历史统计
+  if (currentUser && currentUser.role === 'admin' && !_appHistoryCounts) {
+    fetchHistoryCounts();
+  }
 }
 
 // 切换单个选中状态
@@ -3411,8 +3446,8 @@ function viewApplication(id){
   }
   
   document.getElementById('detailContent').innerHTML=`
-    <div class="detail-section"><div class="detail-label">申报人</div><div class="detail-value">${a.userName} (${a.dept||''})</div></div>
-    <div class="detail-section"><div class="detail-label">联系方式</div><div class="detail-value">${a.contact||'无'}</div></div>
+    <div class="detail-section"><div class="detail-label">申报人(账号)</div><div class="detail-value">${a.userName || '-'}</div></div>
+    <div class="detail-section"><div class="detail-label">接口人(填写)</div><div class="detail-value">${a.contactName || a.contact || '-'}</div></div>
     <div class="detail-section"><div class="detail-label">奖项</div><div class="detail-value">${a.awardName}</div></div>
     <div class="detail-section"><div class="detail-label">申报标题</div><div class="detail-value">${a.title}</div></div>
     <div class="detail-section"><div class="detail-label">当前状态</div>
@@ -3429,8 +3464,12 @@ function viewApplication(id){
       </div>`).join('') : '<span style="color:#8A8A8A;">无附件</span>'}</div>
     </div>
     <div class="detail-section"><div class="detail-label">用户ID</div><div class="detail-value" style="font-size:12px;color:#8A8A8A;">${a.userId}</div></div>
+    <div id="adminHistorySection"></div>
   `;
   showModal('detailModal');
+  
+  // 异步加载后端修改历史
+  loadApplicationHistory(id);
 }
 
 function downloadAppFile(appId, fileIndex) {
@@ -3440,6 +3479,53 @@ function downloadAppFile(appId, fileIndex) {
     link.href = app.files[fileIndex].dataUrl;
     link.download = app.files[fileIndex].name;
     link.click();
+  }
+}
+
+// 从后端加载申报修改历史（管理员弹窗用）
+async function loadApplicationHistory(applicationId) {
+  const container = document.getElementById('adminHistorySection');
+  if (!container) return;
+  
+  // 先显示加载状态
+  container.innerHTML = '<div class="detail-section"><div class="detail-label">📋 修改历史</div><div class="detail-value" style="color:#8A8A8A;font-size:13px;">正在加载...</div></div>';
+  
+  try {
+    if (!backendAvailable || !_authToken) {
+      container.innerHTML = '';
+      return;
+    }
+    
+    const res = await api.get('/applications/' + applicationId + '/history');
+    if (!res.success || !res.data || res.data.length === 0) {
+      container.innerHTML = '';
+      return;
+    }
+    
+    const history = res.data;
+    let html = `<div class="detail-section">
+      <div class="detail-label">📋 修改历史（共 ${history.length} 次编辑）</div>
+      <div class="detail-value" style="background:#FAF8F5;border-radius:12px;padding:12px;">
+        ${history.map(h => `
+          <div style="padding:10px 0;border-bottom:1px dashed #E8E4DF;font-size:13px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <span style="font-weight:500;color:#5C6B73;">版本 v${h.version}</span>
+              <span style="color:#8A8A8A;font-size:12px;">${formatDateTime(h.changed_at)} · 操作人：${h.changed_by_name || '未知'}</span>
+            </div>
+            ${h.change_note ? `<div style="background:#FFF8ED;border-left:3px solid #D4A574;padding:6px 10px;margin-top:4px;font-size:12px;color:#666;">${h.change_note}</div>` : ''}
+            <div style="margin-top:6px;display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:#8A8A8A;">
+              ${h.contact_name ? '<span>接口人: ' + h.contact_name + '</span>' : ''}
+              ${h.project_name ? '<span>项目: ' + h.project_name + '</span>' : ''}
+              ${h.status ? '<span>状态: ' + ({pending:'待审核',approved:'已通过',rejected:'已驳回'}[h.status] || h.status) + '</span>' : ''}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+    container.innerHTML = html;
+  } catch (e) {
+    console.warn('[loadApplicationHistory] 加载失败:', e.message);
+    container.innerHTML = '';
   }
 }
 
