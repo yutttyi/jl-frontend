@@ -1748,7 +1748,7 @@ function renderHomeStats() {
   }
   
   // 用户视角
-  const myApps = applications.filter(a => a.userId === currentUser.id && !a.deleted);
+  const myApps = applications.filter(a => String(a.userId) === String(currentUser.id) && !a.deleted);
   
   if (myApps.length === 0) {
     statsEl.style.display = 'none';
@@ -1783,7 +1783,7 @@ function renderHomeMyRecords() {
   
   // 重新加载最新申报数据
   applications = JSON.parse(localStorage.getItem('applications')) || applications;
-  const myApps = applications.filter(a => a.userId === currentUser.id && !a.deleted);
+  const myApps = applications.filter(a => String(a.userId) === String(currentUser.id) && !a.deleted);
   
   if (myApps.length === 0) {
     container.innerHTML = '';
@@ -2144,7 +2144,7 @@ function showAwardDetail(awardId) {
   }
   
   // 检查用户是否已申报过该奖项
-  const existingApp = currentUser ? applications.find(a => a.userId === currentUser.id && a.awardId === awardId) : null;
+  const existingApp = currentUser ? applications.find(a => String(a.userId) === String(currentUser.id) && a.awardId === awardId) : null;
   
   // 申报按钮
   if (award.status === 'active') {
@@ -2732,7 +2732,7 @@ function renderMyRecords() {
   applications = JSON.parse(localStorage.getItem('applications')) || applications;
   awards = JSON.parse(localStorage.getItem('awards')) || awards;
   
-  const my=applications.filter(a=>a.userId===currentUser.id && !a.deleted);
+  const my=applications.filter(a=>String(a.userId)===String(currentUser.id) && !a.deleted);
   if(my.length===0){c.innerHTML='<div class="empty-state">暂无申报记录</div>';return;}
   
   const sm={pending:'待审核',approved:'已通过',rejected:'已驳回'},sc={pending:'pending',approved:'approved',rejected:'rejected'};
