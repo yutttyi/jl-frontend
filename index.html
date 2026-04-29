@@ -1534,6 +1534,7 @@ async function syncDataFromBackend(showToastMsg = true) {
           file: t.file_name || t.file || '',
           awardId: String(t.award_id || t.awardId || ''),
           type: t.type || 'award',
+          dataUrl: t.file_url ? API_BASE + (t.file_url.startsWith('/') ? '' : '/') + t.file_url : ''
         }));
         localStorage.setItem('templates', JSON.stringify(templates));
         console.log('[syncDataFromBackend] 模板已更新:', templates.length, '条');
@@ -2178,21 +2179,37 @@ function renderTemplates() {
   const extIcon={xlsx:'📊',docx:'📝',pdf:'📄'};
   document.getElementById('templateGrid').innerHTML=templates.filter(t => t.type === 'award').map(t=>`<div class="template-card"><div class="template-icon">${extIcon[t.file.split('.').pop()]||'📄'}</div><div class="template-info"><div class="template-name">${t.name}</div><div class="template-desc">${t.desc}</div><div class="template-download" onclick="downloadTemplate(${t.id})">📥 下载模版</div></div></div>`).join('');
 }
-function downloadTemplate(id) { 
+async function downloadTemplate(id) { 
   const t = templates.find(x => x.id === id);
   if (!t) return;
   
-  if (t.dataUrl) {
-    // 直接使用dataUrl下载
+  if (!t.dataUrl) { showToast('❌ 模板文件不存在', 'error'); return; }
+
+  try {
+    let blobUrl = t.dataUrl;
+
+    // 如果是远程URL（非Base64），先fetch再创建blob下载
+    if (t.dataUrl.startsWith('http')) {
+      showToast('⏳ 正在下载文件...', 'info');
+      const resp = await fetch(t.dataUrl, { headers: _authToken ? { 'Authorization': 'Bearer ' + _authToken } : {} });
+      if (!resp.ok) throw new Error('文件获取失败 (' + resp.status + ')');
+      const blob = await resp.blob();
+      blobUrl = URL.createObjectURL(blob);
+    }
+
     const a = document.createElement('a');
-    a.href = t.dataUrl;
+    a.href = blobUrl;
     a.download = t.file || '模板文件';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+
+    // 如果创建了临时blob URL，释放它
+    if (blobUrl.startsWith('blob:')) URL.revokeObjectURL(blobUrl);
     showToast('开始下载: ' + (t.name || t.file), 'success');
-  } else {
-    showToast('❌ 模板文件不存在', 'error');
+  } catch(e) {
+    console.error('[downloadTemplate] 下载失败:', e);
+    showToast('❌ 下载失败: ' + e.message, 'error');
   }
 }
 
@@ -3718,13 +3735,26 @@ function uploadAwardTemplate(event) {
   event.target.value = '';
 }
 
-function downloadAwardTemplateAdmin(id) {
+async function downloadAwardTemplateAdmin(id) {
   const t = templates.find(x => x.id === id);
-  if (t && t.dataUrl) {
+  if (!t || !t.dataUrl) { showToast('❌ 模板文件不存在', 'error'); return; }
+
+  try {
+    let blobUrl = t.dataUrl;
+    if (t.dataUrl.startsWith('http')) {
+      const resp = await fetch(t.dataUrl, { headers: _authToken ? { 'Authorization': 'Bearer ' + _authToken } : {} });
+      if (!resp.ok) throw new Error('文件获取失败');
+      const blob = await resp.blob();
+      blobUrl = URL.createObjectURL(blob);
+    }
+
     const link = document.createElement('a');
-    link.href = t.dataUrl;
-    link.download = t.file;
+    link.href = blobUrl;
+    link.download = t.file || '模板文件';
     link.click();
+    if (blobUrl.startsWith('blob:')) URL.revokeObjectURL(blobUrl);
+  } catch(e) {
+    showToast('❌ 下载失败: ' + e.message, 'error');
   }
 }
 
