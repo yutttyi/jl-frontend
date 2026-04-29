@@ -1797,7 +1797,14 @@ function renderHomeMyRecords() {
   
   // 重新加载最新申报数据
   applications = JSON.parse(localStorage.getItem('applications')) || applications;
+  
+  console.log('[renderHomeMyRecords] 当前用户:', JSON.stringify(currentUser));
+  console.log('[renderHomeMyRecords] 所有申报数:', applications.length);
+  console.log('[renderHomeMyRecords] 申报数据前3条:', JSON.stringify(applications.slice(0, 3)).substring(0, 500));
+  
   const myApps = applications.filter(a => String(a.userId) === String(currentUser.id) && !a.deleted);
+  console.log('[renderHomeMyRecords] 过滤后匹配数:', myApps.length,
+    '(currentUser.id类型:', typeof currentUser.id, '值:', currentUser.id, ')');
   
   if (myApps.length === 0) {
     container.innerHTML = '';
@@ -2746,7 +2753,12 @@ function renderMyRecords() {
   applications = JSON.parse(localStorage.getItem('applications')) || applications;
   awards = JSON.parse(localStorage.getItem('awards')) || awards;
   
+  console.log('[renderMyRecords] 当前用户:', JSON.stringify(currentUser));
+  console.log('[renderMyRecords] 所有申报数:', applications.length);
+  
   const my=applications.filter(a=>String(a.userId)===String(currentUser.id) && !a.deleted);
+  console.log('[renderMyRecords] 过滤后匹配数:', my.length,
+    '(currentUser.id:', typeof currentUser.id, '=', currentUser.id, ')');
   if(my.length===0){c.innerHTML='<div class="empty-state">暂无申报记录</div>';return;}
   
   const sm={pending:'待审核',approved:'已通过',rejected:'已驳回'},sc={pending:'pending',approved:'approved',rejected:'rejected'};
