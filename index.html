@@ -2230,7 +2230,12 @@ function initUpload() {
 function checkAwardTemplate(awardId) {
   const info = document.getElementById('awardTemplateInfo');
   const nameEl = document.getElementById('templateFileName');
-  const awardTemplates = templates.filter(t => t.awardId === awardId && t.type === 'award');
+  const awardTemplates = templates.filter(t =>
+    t.type === 'award' && (
+      t.awardId === awardId ||
+      String(t.awardId) === String(awardId)
+    )
+  );
   
   if (awardTemplates.length > 0) {
     info.style.display = 'block';
@@ -2244,7 +2249,12 @@ function checkAwardTemplate(awardId) {
 
 function downloadAwardTemplate() {
   if (!selectedTemplateAwardId) return;
-  const awardTemplates = templates.filter(t => t.awardId === selectedTemplateAwardId && t.type === 'award');
+  const awardTemplates = templates.filter(t =>
+    t.type === 'award' && (
+      t.awardId === selectedTemplateAwardId ||
+      String(t.awardId) === String(selectedTemplateAwardId)
+    )
+  );
   if (awardTemplates.length > 0) {
     downloadTemplate(awardTemplates[0].id);
   } else {
@@ -2256,17 +2266,28 @@ function downloadAwardTemplate() {
 function showTemplateSelectModal() {
   awards = JSON.parse(localStorage.getItem('awards')) || awards;
   templates = JSON.parse(localStorage.getItem('templates')) || templates;
-  
+
   const selectedId = document.getElementById('selectAward').value;
   if (!selectedId) {
     showToast('请先选择申报奖项', 'error');
     return;
   }
-  
+
   const award = awards.find(a => a.id === selectedId);
   if (!award) return;
-  
-  const awardTemplates = templates.filter(t => t.awardId === selectedId && t.type === 'award');
+
+  // 兼容匹配：严格匹配 + 宽松匹配（处理ID类型不一致的情况）
+  const awardTemplates = templates.filter(t =>
+    t.type === 'award' && (
+      t.awardId === selectedId ||
+      String(t.awardId) === String(selectedId) ||
+      Number(t.awardId) === Number(selectedId)
+    )
+  );
+
+  console.log('[showTemplateSelectModal] selectedId:', selectedId, 'awardName:', award.name,
+    '所有模板:', templates.map(t => ({id:t.id, name:t.name, awardId:t.awardId, type:t.type})),
+    '匹配结果:', awardTemplates.length);
   
   const extIcon = {xlsx: '📊', xls: '📊', docx: '📝', doc: '📝', pdf: '📄'};
   const list = document.getElementById('templateSelectList');
@@ -2297,17 +2318,32 @@ function showTemplateSelectModal() {
 }
 
 // 下载指定ID的模板
-function downloadTemplateById(templateId) {
+async function downloadTemplateById(templateId) {
   const t = templates.find(x => x.id === templateId);
-  if (!t) return;
-  
-  const a = document.createElement('a');
-  a.href = t.dataUrl || 'data:text/plain;charset=utf-8,模版文件:' + t.file;
-  a.download = t.file;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  showToast('开始下载: ' + t.file, 'success');
+  if (!t || !t.dataUrl) { showToast('❌ 模板文件不存在', 'error'); return; }
+
+  try {
+    let blobUrl = t.dataUrl;
+    // 如果是远程URL，先fetch再blob下载
+    if (t.dataUrl.startsWith('http')) {
+      const resp = await fetch(t.dataUrl, { headers: _authToken ? { 'Authorization': 'Bearer ' + _authToken } : {} });
+      if (!resp.ok) throw new Error('文件获取失败');
+      const blob = await resp.blob();
+      blobUrl = URL.createObjectURL(blob);
+    }
+
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = t.file || '模板文件';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    if (blobUrl.startsWith('blob:')) URL.revokeObjectURL(blobUrl);
+    showToast('开始下载: ' + t.file, 'success');
+  } catch(e) {
+    showToast('❌ 下载失败: ' + e.message, 'error');
+  }
+}
 }
 
 // 下载当前选中奖项的模板（调用模板选择弹窗）
@@ -3622,13 +3658,19 @@ function triggerTemplateUpload() {
 function loadAwardTemplates() {
   const awardId = document.getElementById('templateAwardSelect').value;
   const list = document.getElementById('awardTemplateList');
-  
+
   if (!awardId) {
     list.innerHTML = '<div class="no-template">请先选择奖项</div>';
     return;
   }
-  
-  const awardTemplates = templates.filter(t => t.awardId === awardId && t.type === 'award');
+
+  // 兼容匹配
+  const awardTemplates = templates.filter(t =>
+    t.type === 'award' && (
+      t.awardId === awardId ||
+      String(t.awardId) === String(awardId)
+    )
+  );
   
   if (awardTemplates.length === 0) {
     list.innerHTML = '<div class="no-template">该奖项暂无申报表，请上传</div>';
