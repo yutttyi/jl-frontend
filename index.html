@@ -4216,34 +4216,50 @@ function initHistoryFilterOptions() {
 // 渲染修改记录表格（从后端加载）
 async function renderEditLogs() {
   initHistoryFilterOptions();
-  
+
   const tbody = document.getElementById('editLogsTable');
   if (!tbody) return;
-  
+
   // 筛选条件
   const filterAward = document.getElementById('historyFilterAward') ? document.getElementById('historyFilterAward').value : '';
   const searchKeyword = document.getElementById('historySearchKeyword') ? document.getElementById('historySearchKeyword').value.toLowerCase() : '';
-  
+
   try {
     // 如果没有缓存数据，从后端加载
     if (!_allHistoryData) {
+      // 预检：未登录或非管理员时直接显示空
+      if (!backendAvailable) {
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-state">后端不可用，无法加载修改记录</td></tr>';
+        return;
+      }
+      if (!_authToken) {
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-state">请先登录</td></tr>';
+        return;
+      }
+      if (!currentUser) {
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-state">用户信息缺失，请刷新页面重新登录</td></tr>';
+        return;
+      }
+      if (currentUser.role !== 'admin') {
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-state">仅管理员可查看修改记录</td></tr>';
+        return;
+      }
+
       tbody.innerHTML = '<tr><td colspan="9" class="empty-state">正在加载修改记录...</td></tr>';
-      
-      if (backendAvailable && _authToken && currentUser && currentUser.role === 'admin') {
-        const res = await api.get('/applications/all-history');
-        if (res.success) {
-          _allHistoryData = res.data || [];
-          console.log('[renderEditLogs] 加载到', _allHistoryData.length, '条历史记录');
-        } else {
-          _allHistoryData = [];
-        }
+
+      const res = await api.get('/applications/all-history');
+      if (res.success) {
+        _allHistoryData = res.data || [];
+        console.log('[renderEditLogs] 加载到', _allHistoryData.length, '条历史记录');
       } else {
+        // 后端返回 success:false（不应该发生，但防御性处理）
+        console.warn('[renderEditLogs] 后端返回 success:false', res);
         _allHistoryData = [];
       }
     }
-    
+
     let data = [..._allHistoryData];
-    
+
     // 按奖项筛选
     if (filterAward) data = data.filter(h => String(h.award_id) === String(filterAward));
     // 按关键词搜索
@@ -4255,22 +4271,27 @@ async function renderEditLogs() {
         (h.award_name && h.award_name.toLowerCase().includes(searchKeyword))
       );
     }
-    
+
+    if (data.length === 0 && _allHistoryData.length > 0) {
+      tbody.innerHTML = '<tr><td colspan="9" class="empty-state">没有匹配筛选条件的修改记录</td></tr>';
+      return;
+    }
+
     if (data.length === 0) {
       tbody.innerHTML = '<tr><td colspan="9" class="empty-state">暂无修改记录</td></tr>';
       return;
     }
-    
+
     // 状态映射
     const sm = {pending:'待审核',approved:'已通过',rejected:'已驳回'};
-    
+
     tbody.innerHTML = data.map(h => {
       const statusText = sm[h.hist_status] || h.hist_status || '-';
       const statusColor = {pending:'#D4A574',approved:'#81B29A',rejected:'#C07D6F'}[h.hist_status] || '#666';
       // 解析附件数量
       let attachCount = 0;
       try { const att = typeof h.hist_attachments === 'string' ? JSON.parse(h.hist_attachments) : h.hist_attachments; attachCount = Array.isArray(att) ? att.length : 0; } catch(e) {}
-      
+
       return `<tr>
         <td><span style="background:#E8F4FD;color:#2E86AB;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;">v${h.version}</span></td>
         <td>${h.username || '-'}</td>
@@ -4287,7 +4308,21 @@ async function renderEditLogs() {
     }).join('');
   } catch(e) {
     console.error('[renderEditLogs] 错误:', e);
-    tbody.innerHTML = '<tr><td colspan="9" class="empty-state">加载失败，请刷新重试</td></tr>';
+    // 区分不同类型的错误，给用户更有用的提示
+    let errMsg = '加载失败';
+    const msg = e.message || '';
+    if (msg.includes('401') || msg.includes('未登录') || msg.includes('Token')) {
+      errMsg = '登录已过期，请重新登录';
+    } else if (msg.includes('403') || msg.includes('权限') || msg.includes('管理员')) {
+      errMsg = '权限不足，需要管理员身份';
+    } else if (msg.includes('404') || msg.includes('Not Found')) {
+      errMsg = '接口不存在，请确认后端已部署最新版本';
+    } else if (msg.includes('500') || msg.includes('服务器')) {
+      errMsg = '服务器内部错误，请联系管理员';
+    } else if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('网络')) {
+      errMsg = '网络连接失败，请检查网络';
+    }
+    tbody.innerHTML = `<tr><td colspan="9" class="empty-state">${errMsg}，<a href="#" onclick="_allHistoryData=null;renderEditLogs();return false;" style="color:#2E86AB;text-decoration:underline;">点击重试</a></td></tr>`;
   }
 }
 
