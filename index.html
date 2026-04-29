@@ -1552,6 +1552,20 @@ async function syncDataFromBackend(showToastMsg = true) {
       }
     }
     
+    // 自动修复：如果 currentUser.id 为空（旧 token 注册的用户），从后端补全
+    if (currentUser && (!currentUser.id || currentUser.id === 'undefined')) {
+      try {
+        const meRes = await api.get('/auth/me');
+        if (meRes.success && meRes.data) {
+          currentUser.id = meRes.data.id;
+          localStorage.setItem('currentUser', JSON.stringify(currentUser));
+          console.log('[syncDataFromBackend] 已自动修复用户ID:', meRes.data.id);
+        }
+      } catch(e) {
+        console.warn('[syncDataFromBackend] 修复用户ID失败:', e.message);
+      }
+    }
+    
     _syncStatus.lastSync = new Date();
     _syncStatus.lastError = null;
     
