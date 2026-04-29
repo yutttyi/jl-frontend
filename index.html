@@ -829,13 +829,18 @@
         <div class="admin-header">
           <div class="admin-header-title">📝 修改记录</div>
           <div class="admin-header-right">
-            <button class="export-btn" onclick="downloadAllAttachments()">📦 下载所有附件</button>
             <button class="export-btn" onclick="exportEditLogs()">📥 导出记录</button>
           </div>
         </div>
         <div class="admin-card">
-          <div class="admin-card-title">申报修改历史</div>
-          <div id="editLogsList"></div>
+          <div class="filter-bar">
+            <select class="filter-select" id="historyFilterAward" onchange="renderEditLogs()"><option value="">全部奖项</option></select>
+            <input type="text" class="search-input" id="historySearchKeyword" placeholder="搜索申报人/项目名" oninput="renderEditLogs()">
+          </div>
+          <table class="data-table">
+            <thead><tr><th>版本</th><th>申报人(账号)</th><th>接口人</th><th>奖项</th><th>修改前项目名称</th><th>变更内容</th><th>修改时间</th><th>操作人</th><th>操作</th></tr></thead>
+            <tbody id="editLogsTable"></tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -2911,7 +2916,8 @@ function switchAdminPanel(panel) {
     updateTemplateAwardSelect();
   }
   if (panel === 'editlogs') {
-    editLogs = JSON.parse(localStorage.getItem('editLogs')) || editLogs;
+    // 切换到修改记录面板时清空后端缓存，重新从服务器加载
+    _allHistoryData = null;
   }
   
   document.querySelectorAll('.admin-menu-item').forEach(item => {
@@ -4180,255 +4186,281 @@ async function deleteNotice(id) {
 }
 
 // ==================== 修改记录管理 ====================
-function renderEditLogs() {
-  editLogs = JSON.parse(localStorage.getItem('editLogs')) || editLogs;
-  applications = JSON.parse(localStorage.getItem('applications')) || applications;
+
+// 全局缓存：后端历史数据
+let _allHistoryData = null;
+
+// 初始化修改记录页面奖项筛选下拉
+function initHistoryFilterOptions() {
+  const select = document.getElementById('historyFilterAward');
+  if (!select) return;
+  // 从 awards 数据填充
+  const aw = JSON.parse(localStorage.getItem('awards')) || awards;
+  select.innerHTML = '<option value="">全部奖项</option>' + aw.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
+}
+
+// 渲染修改记录表格（从后端加载）
+async function renderEditLogs() {
+  initHistoryFilterOptions();
   
-  const container = document.getElementById('editLogsList');
-  if (editLogs.length === 0) {
-    container.innerHTML = '<div class="empty-state">暂无修改记录</div>';
-    return;
-  }
+  const tbody = document.getElementById('editLogsTable');
+  if (!tbody) return;
   
-  // 按时间倒序排列
-  const sortedLogs = [...editLogs].sort((a, b) => new Date(b.editTime) - new Date(a.editTime));
+  // 筛选条件
+  const filterAward = document.getElementById('historyFilterAward') ? document.getElementById('historyFilterAward').value : '';
+  const searchKeyword = document.getElementById('historySearchKeyword') ? document.getElementById('historySearchKeyword').value.toLowerCase() : '';
   
-  container.innerHTML = '<table class="data-table"><thead><tr><th>序号</th><th>申报奖项</th><th>申报人</th><th>申报标题</th><th>附件数</th><th>修改时间</th><th>操作</th></tr></thead><tbody>' +
-    sortedLogs.map((log, i) => {
-      const app = applications.find(a => a.id === log.appId);
-      const currentFiles = app ? app.files : [];
-      const isDeleted = app && app.deleted;
-      const statusText = isDeleted ? '<span style="color:#C07D6F;">(已删除)</span>' : '';
-      const statusClass = isDeleted ? 'status-deleted' : '';
+  try {
+    // 如果没有缓存数据，从后端加载
+    if (!_allHistoryData) {
+      tbody.innerHTML = '<tr><td colspan="9" class="empty-state">正在加载修改记录...</td></tr>';
       
-      return '<tr class="' + statusClass + '">' +
-        '<td>' + (i + 1) + '</td>' +
-        '<td>' + log.awardName + '</td>' +
-        '<td>' + log.userName + '</td>' +
-        '<td>' + log.oldData.title + '</td>' +
-        '<td>修改前:' + log.oldData.filesCount + ' → <span style="color:#5C6B73;font-weight:600;">' + log.newData.filesCount + '</span></td>' +
-        '<td>' + formatDateTime(log.editTime) + '</td>' +
-        '<td><button class="btn btn-secondary" style="height:28px;font-size:12px;margin-right:4px;" onclick="showAppDetailForAdmin(' + log.appId + ',\'' + log.id + '\')">查看详情</button></td>' +
-      '</tr>';
-    }).join('') +
-    '</tbody></table>';
+      if (backendAvailable && _authToken && currentUser && currentUser.role === 'admin') {
+        const res = await api.get('/applications/all-history');
+        if (res.success) {
+          _allHistoryData = res.data || [];
+          console.log('[renderEditLogs] 加载到', _allHistoryData.length, '条历史记录');
+        } else {
+          _allHistoryData = [];
+        }
+      } else {
+        _allHistoryData = [];
+      }
+    }
+    
+    let data = [..._allHistoryData];
+    
+    // 按奖项筛选
+    if (filterAward) data = data.filter(h => String(h.award_id) === String(filterAward));
+    // 按关键词搜索
+    if (searchKeyword) {
+      data = data.filter(h =>
+        (h.username && h.username.toLowerCase().includes(searchKeyword)) ||
+        (h.hist_project_name && h.hist_project_name.toLowerCase().includes(searchKeyword)) ||
+        (h.hist_contact_name && h.hist_contact_name.toLowerCase().includes(searchKeyword)) ||
+        (h.award_name && h.award_name.toLowerCase().includes(searchKeyword))
+      );
+    }
+    
+    if (data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="9" class="empty-state">暂无修改记录</td></tr>';
+      return;
+    }
+    
+    // 状态映射
+    const sm = {pending:'待审核',approved:'已通过',rejected:'已驳回'};
+    
+    tbody.innerHTML = data.map(h => {
+      const statusText = sm[h.hist_status] || h.hist_status || '-';
+      const statusColor = {pending:'#D4A574',approved:'#81B29A',rejected:'#C07D6F'}[h.hist_status] || '#666';
+      // 解析附件数量
+      let attachCount = 0;
+      try { const att = typeof h.hist_attachments === 'string' ? JSON.parse(h.hist_attachments) : h.hist_attachments; attachCount = Array.isArray(att) ? att.length : 0; } catch(e) {}
+      
+      return `<tr>
+        <td><span style="background:#E8F4FD;color:#2E86AB;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;">v${h.version}</span></td>
+        <td>${h.username || '-'}</td>
+        <td>${h.hist_contact_name || '-'}</td>
+        <td>${h.award_name||''}</td>
+        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;">${h.hist_project_name||'-'}</td>
+        <td style="max-width:250px;"><div style="background:#FFF8ED;border-left:3px solid #D4A574;padding:4px 8px;font-size:12px;color:#666;white-space:normal;word-break:break-all;">${h.change_note||'信息更新'}</div></td>
+        <td>${formatDateTime(h.changed_at)}</td>
+        <td>${h.changed_by_name||'-'}</td>
+        <td class="actions">
+          <button class="action-btn view-btn" onclick="viewHistoryDetail(${h.history_id}, ${h.application_id})">查看详情</button>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch(e) {
+    console.error('[renderEditLogs] 错误:', e);
+    tbody.innerHTML = '<tr><td colspan="9" class="empty-state">加载失败，请刷新重试</td></tr>';
+  }
 }
 
-// 显示申报详情弹窗（管理员查看修改记录的申报）
-function showAppDetailForAdmin(appId, editId) {
-  const app = applications.find(a => a.id == appId);
-  const log = editLogs.find(l => l.id == editId || (l.appId == appId && l.editTime));
-  
-  if (!app && !log) {
-    showToast('未找到申报记录', 'error');
-    return;
-  }
-  
-  const isDeleted = app && app.deleted;
-  const files = app ? app.files : (log ? log.oldData.files || [] : []);
-  const deletedBy = app && app.deletedBy ? users.find(u => u.id === app.deletedBy) : null;
-  
-  let html = '<div style="margin-bottom:20px;">';
-  html += '<div class="detail-section"><div class="detail-label">申报奖项</div><div class="detail-value">' + (app ? app.awardName : log.awardName) + '</div></div>';
-  html += '<div class="detail-section"><div class="detail-label">申报人</div><div class="detail-value">' + (app ? app.userName : log.userName) + '</div></div>';
-  html += '<div class="detail-section"><div class="detail-label">联系方式</div><div class="detail-value">' + (app ? app.contact || '无' : log.oldData.contact || '无') + '</div></div>';
-  html += '<div class="detail-section"><div class="detail-label">申报标题</div><div class="detail-value">' + (app ? app.title : log.oldData.title) + '</div></div>';
-  
-  if (isDeleted) {
-    html += '<div class="detail-section"><div class="detail-label">状态</div><div class="detail-value"><span style="background:#F5EBE7;color:#8B5A4A;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;">已删除</span></div></div>';
-    if (deletedBy) html += '<div class="detail-section"><div class="detail-label">删除人</div><div class="detail-value">' + deletedBy.name + '</div></div>';
-    if (app && app.deleteTime) html += '<div class="detail-section"><div class="detail-label">删除时间</div><div class="detail-value">' + formatDateTime(app.deleteTime) + '</div></div>';
-    if (app && app.deleteReason) html += '<div class="detail-section"><div class="detail-label">删除原因</div><div class="detail-value" style="color:#C07D6F;">' + app.deleteReason + '</div></div>';
-  }
-  
-  html += '</div>';
-  html += '<div class="detail-section"><div class="detail-label">📎 附件列表 (' + files.length + ')</div>';
-  html += '<div class="detail-value">';
-  
-  if (files.length === 0) {
-    html += '<span style="color:#8A8A8A;">无附件</span>';
-  } else {
-    files.forEach((f, i) => {
-      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(92,107,115,0.08);">';
-      html += '<div><span>📄</span> <span style="margin-left:8px;">' + f.name + '</span><span style="color:#8A8A8A;font-size:12px;margin-left:8px;">' + formatFileSize(f.size) + '</span></div>';
-      html += '<button class="btn btn-secondary" style="height:28px;font-size:12px;" onclick="downloadFileDirect(\'' + (f.dataUrl || '') + '\',\'' + f.name + '\')">下载</button>';
-      html += '</div>';
-    });
-    // 全选下载按钮
-    html += '<div style="margin-top:12px;padding-top:12px;border-top:2px dashed rgba(92,107,115,0.12);">';
-    html += '<button class="btn btn-primary" style="height:32px;font-size:13px;" onclick="downloadAllFilesFromList(' + appId + ',\'' + editId + '\')">📦 下载全部附件</button>';
-    html += '</div>';
-  }
-  
-  html += '</div></div>';
-  
-  document.getElementById('detailContent').innerHTML = html;
-  document.getElementById('auditStatus').value = 'pending';
-  document.getElementById('auditStatus').disabled = true;
-  document.getElementById('rejectReason').style.display = 'none';
-  currentDetailId = appId;
+// 查看历史版本详情弹窗
+async function viewHistoryDetail(historyId, applicationId) {
   showModal('detailModal');
+  document.getElementById('modalTitle').textContent = '📋 历史版本详情';
+  document.getElementById('auditSection').style.display = 'none';
+  
+  const contentEl = document.getElementById('detailContent');
+  contentEl.innerHTML = '<div style="text-align:center;padding:40px;color:#8A8A8A;">正在加载详情...</div>';
+  
+  try {
+    // 获取该申报的所有历史版本
+    const res = await api.get('/applications/' + applicationId + '/history');
+    if (!res.success || !res.data) {
+      contentEl.innerHTML = '<div style="text-align:center;padding:40px;color:#C07D6F;">未找到历史记录</div>';
+      return;
+    }
+    
+    const allVersions = res.data;
+    const currentVersion = allVersions.find(v => v.id === historyId);
+    
+    if (!currentVersion) {
+      contentEl.innerHTML = '<div style="text-align:center;padding:40px;color:#C07D6F;">未找到指定版本</div>';
+      return;
+    }
+    
+    // 获取当前申报信息用于对比显示
+    const appRes = await api.get('/applications/' + applicationId);
+    const currentApp = (appRes.success && appRes.data) ? appRes.data : null;
+    
+    const sm = {pending:'待审核',approved:'已通过',rejected:'已驳回'};
+    
+    let html = '';
+    
+    // 基本信息
+    html += `<div style="margin-bottom:16px;display:flex;gap:8px;align-items:center;">
+      <span style="background:#2E86AB;color:#fff;font-size:11px;padding:3px 10px;border-radius:12px;font-weight:600;">v${currentVersion.version} · 历史快照</span>
+      <span style="color:#8A8A8A;font-size:13px;">${formatDateTime(currentVersion.changed_at)}</span>
+      <span style="color:#8A8A8A;font-size:13px;">操作人：${currentVersion.changed_by_name || '未知'}</span>
+    </div>`;
+    
+    // 修改前（本版本）的信息
+    html += `<div style="background:#FAF8F5;border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid #E8E4DF;">
+      <div style="font-weight:600;color:#8B7355;margin-bottom:12px;font-size:14px;">📝 修改前的信息（此版本）</div>`;
+    html += `<div style="margin-bottom:10px;"><span style="color:#8A8A8A;font-size:13px;display:inline-block;width:80px;">接口人：</span><span style="font-size:14px;">${currentVersion.contact_name || '-'}</span></div>`;
+    html += `<div style="margin-bottom:10px;"><span style="color:#8A8A8A;font-size:13px;display:inline-block;width:80px;">项目名：</span><span style="font-size:14px;">${currentVersion.project_name || '-'}</span></div>`;
+    html += `<div style="margin-bottom:10px;"><span style="color:#8A8A8A;font-size:13px;display:inline-block;width:80px;">状态：</span><span style="font-size:14px;color:${{pending:'#D4A574',approved:'#81B29A',rejected:'#C07D6F'}[currentVersion.status]||'#666'};font-weight:500;">${sm[currentVersion.status]||currentVersion.status||'-'}</span></div>`;
+    
+    // 变更说明
+    if (currentVersion.change_note) {
+      html += `<div style="margin-top:10px;background:#FFF8ED;border-left:3px solid #D4A574;padding:8px 12px;font-size:13px;color:#666;">
+        <strong>变更内容：</strong>${currentVersion.change_note}
+      </div>`;
+    }
+    html += '</div>';
+    
+    // 当前最新信息（对比用）
+    if (currentApp) {
+      html += `<div style="background:#F0F9FF;border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid #D0EBFF;">
+        <div style="font-weight:600;color:#2E86AB;margin-bottom:12px;font-size:14px;">✅ 当前最新信息</div>`;
+        html += `<div style="margin-bottom:10px;"><span style="color:#8A8A8A;font-size:13px;display:inline-block;width:80px;">接口人：</span><span style="font-size:14px;">${currentApp.contact_name || '-'}</span></div>`;
+        html += `<div style="margin-bottom:10px;"><span style="color:#8A8A8A;font-size:13px;display:inline-block;width:80px;">项目名：</span><span style="font-size:14px;">${currentApp.project_name || '-'}</span></div>`;
+        html += `<div style="margin-bottom:10px;"><span style="color:#8A8A8A;font-size:13px;display:inline-block;width:80px;">状态：</span><span style="font-size:14px;color:${{pending:'#D4A574',approved:'#81B29A',rejected:'#C07D6F'}[currentApp.status]||'#666'};font-weight:500;">${sm[currentApp.status]||currentApp.status||'-'}</span></div>`;
+      html += '</div>';
+    }
+    
+    // 历史版本的附件列表
+    html += '<div style="margin-bottom:16px;">';
+    html += `<div style="font-size:14px;color:#8A8A8A;margin-bottom:8px;">📎 此版本附件</div>`;
+    
+    let histFiles = [];
+    try { histFiles = typeof currentVersion.attachments === 'string' ? JSON.parse(currentVersion.attachments) : (currentVersion.attachments || []); } catch(e) {}
+    
+    if (!Array.isArray(histFiles) || histFiles.length === 0) {
+      html += '<div style="color:#8A8A8A;font-size:13px;">无附件</div>';
+    } else {
+      html += '<div style="background:white;border-radius:8px;padding:8px;">';
+      histFiles.forEach((f, fi) => {
+        const fname = f.name || f.fileName || ('文件'+(fi+1));
+        const fsize = f.size || 0;
+        const hasData = f.dataUrl || f.data || f.base64;
+        html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(92,107,115,0.06);">
+          <div><span>📄 ${fname}</span><span style="color:#8A8A8A;font-size:12px;margin-left:6px;">${fsize ? formatFileSize(fsize) : ''}</span></div>
+          ${hasData ? `<button class="btn btn-secondary" style="height:26px;font-size:11px;" onclick="downloadHistoryFile(${historyId},${fi})">下载</button>` : '<span style="color:#ccc;font-size:12px;">无数据</span>'}
+        </div>`;
+      });
+      html += '</div>';
+    }
+    html += '</div>';
+    
+    // 所有版本时间线
+    if (allVersions.length > 1) {
+      html += `<div style="margin-top:16px;">
+        <div style="font-size:14px;color:#8A8A8A;margin-bottom:10px;">🕐 完整编辑历史（共 ${allVersions.length} 个版本）</div>
+        <div style="border-left:2px solid #E8E4DF;margin-left:8px;padding-left:16px;">
+          ${allVersions.map(v => `
+            <div style="padding:8px 0;position:relative;"${v.id === historyId ? 'style="padding:8px 0;position:relative;background:#FFF8ED;margin:0 -12px;padding:8px 12px;border-radius:8px;"' : ''}>
+              <div style="display:flex;align-items:center;gap:8px;">
+                ${v.id === historyId ? '<span style="background:#2E86AB;color:#fff;font-size:10px;padding:1px 6px;border-radius:4px;">当前</span>' : ''}
+                <span style="font-weight:${v.id === historyId ? '700' : '500'};color:${v.id === historyId ? '#2E86AB' : '#5C6B73'};">v${v.version}</span>
+                <span style="color:#8A8A8A;font-size:12px;">${formatDateTime(v.changed_at)}</span>
+                <span style="color:#8A8A8A;font-size:12px;">· ${v.changed_by_name || '未知'}</span>
+              </div>
+              ${v.change_note ? `<div style="font-size:12px;color:#999;margin-top:2px;">${v.change_note}</div>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+    }
+    
+    contentEl.innerHTML = html;
+    
+    // 缓存当前查看的历史版本供下载使用
+    window._currentHistoryDetail = currentVersion;
+    window._currentHistoryAllVersions = allVersions;
+  } catch(e) {
+    console.error('[viewHistoryDetail] 错误:', e);
+    contentEl.innerHTML = '<div style="text-align:center;padding:40px;color:#C07D6F;">加载失败：' + (e.message||'未知错误') + '</div>';
+  }
 }
 
-// 下载单个文件（不依赖应用数据）
-function downloadFileDirect(dataUrl, fileName) {
-  if (!dataUrl) {
-    showToast('文件数据不存在', 'error');
-    return;
-  }
+// 下载历史版本中的单个文件
+function downloadHistoryFile(historyId, fileIndex) {
+  const ver = window._currentHistoryDetail;
+  if (!ver) { showToast('数据未加载', 'error'); return; }
+  
+  let files = [];
+  try { files = typeof ver.attachments === 'string' ? JSON.parse(ver.attachments) : (ver.attachments || []); } catch(e) {}
+  
+  if (!files[fileIndex]) { showToast('文件不存在', 'error'); return; }
+  
+  const f = files[fileIndex];
+  const dataUrl = f.dataUrl || f.data || f.base64;
+  if (!dataUrl) { showToast('该文件没有可用的下载数据', 'error'); return; }
+  
   const a = document.createElement('a');
   a.href = dataUrl;
-  a.download = fileName;
+  a.download = f.name || f.fileName || ('file_'+fileIndex);
   a.click();
 }
 
-// 下载该申报的所有附件
-function downloadAllFilesFromList(appId, editId) {
-  let files = [];
-  const app = applications.find(a => a.id == appId);
-  if (app && app.files.length > 0) {
-    files = app.files;
-  } else {
-    const log = editLogs.find(l => l.id == editId || (l.appId == appId && l.editTime));
-    if (log && log.oldData && log.oldData.files) {
-      files = log.oldData.files;
-    }
-  }
-  
-  if (files.length === 0) {
-    showToast('没有附件可下载', 'error');
-    return;
-  }
-  
-  const awardName = app ? app.awardName : (editLogs.find(l => l.appId == appId)?.awardName || '未知奖项');
-  const userName = app ? app.userName : (editLogs.find(l => l.appId == appId)?.userName || '未知用户');
-  
-  files.forEach((f, i) => {
-    if (f.dataUrl) {
-      setTimeout(() => {
-        const a = document.createElement('a');
-        a.href = f.dataUrl;
-        a.download = awardName + '_' + userName + '_' + f.name;
-        a.click();
-      }, i * 300);
-    }
-  });
-  
-  showToast('开始下载 ' + files.length + ' 个附件', 'success');
-}
-
-function exportEditLogs() {
-  editLogs = JSON.parse(localStorage.getItem('editLogs')) || editLogs;
-  
-  if (editLogs.length === 0) {
+// 导出修改记录为CSV
+async function exportEditLogs() {
+  if (!_allHistoryData || _allHistoryData.length === 0) {
     showToast('没有可导出的修改记录', 'error');
     return;
   }
   
-  const h = ['序号', '申报奖项', '修改人', '修改人ID', '原申报标题', '新申报标题', '原接口人', '新接口人', '原附件数', '新附件数', '修改时间'];
-  const rows = editLogs.map((log, i) => [
-    i + 1,
-    log.awardName,
-    log.userName,
-    log.userId,
-    log.oldData.title,
-    log.newData.title,
-    log.oldData.userName,
-    log.newData.userName,
-    log.oldData.filesCount,
-    log.newData.filesCount,
-    formatDateTime(log.editTime)
+  // 如果还没加载，先加载
+  if (_allHistoryData === null) {
+    try {
+      if (backendAvailable && _authToken && currentUser && currentUser.role === 'admin') {
+        const res = await api.get('/applications/all-history');
+        if (res.success) _allHistoryData = res.data || [];
+      }
+    } catch(e) {}
+  }
+  
+  if (!_allHistoryData || _allHistoryData.length === 0) {
+    showToast('没有可导出的修改记录', 'error');
+    return;
+  }
+  
+  const headers = ['版本','申报人(账号)','接口人','奖项','修改前项目名','变更说明','修改状态','修改时间','操作人'];
+  const rows = _allHistoryData.map(h => [
+    'v' + h.version,
+    h.username || '',
+    h.hist_contact_name || '',
+    h.award_name || '',
+    h.hist_project_name || '',
+    h.change_note || '',
+    h.hist_status || '',
+    formatDateTime(h.changed_at),
+    h.changed_by_name || ''
   ]);
   
-  let csv = '\uFEFF' + h.join(',') + '\n';
-  rows.forEach(r => { csv += r.map(c => '"' + (c || '').toString().replace(/"/g, '""') + '"').join(',') + '\n'; });
-  
-  const b = new Blob([csv], { type: 'text/csv;charset=utf-8' });
-  const url = URL.createObjectURL(b);
+  const csv = '\uFEFF' + headers.join(',') + '\n' + rows.map(r => r.map(c => '"' + String(c).replace(/"/g,'""') + '"').join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = '修改记录_' + new Date().toISOString().split('T')[0] + '.csv';
+  a.download = '修改记录_' + new Date().toISOString().slice(0,10) + '.csv';
   a.click();
   URL.revokeObjectURL(url);
-  showToast('已导出 ' + editLogs.length + ' 条修改记录');
-}
-
-// 下载所有申报附件（包含已修改、已删除的）
-// 按申报人分组下载所有附件
-function downloadAllAttachments() {
-  const allApps = JSON.parse(localStorage.getItem('applications')) || [];
-  
-  // 按申报人分组收集附件
-  const filesByUser = {};
-  
-  allApps.forEach(app => {
-    const userKey = app.userName || '未知申报人';
-    if (!filesByUser[userKey]) {
-      filesByUser[userKey] = [];
-    }
-    
-    // 未删除的申报
-    if (!app.deleted && app.files) {
-      app.files.forEach(f => {
-        filesByUser[userKey].push({
-          awardName: app.awardName,
-          title: app.title,
-          status: '正常',
-          fileName: f.name,
-          fileData: f.dataUrl
-        });
-      });
-    }
-    // 已修改的申报（旧版本附件）
-    if (app.editHistory) {
-      app.editHistory.forEach(h => {
-        if (h.oldFiles) {
-          h.oldFiles.forEach(f => {
-            filesByUser[userKey].push({
-              awardName: app.awardName,
-              title: app.title,
-              status: '已修改',
-              fileName: f.name,
-              fileData: f.dataUrl
-            });
-          });
-        }
-      });
-    }
-    // 已删除的申报
-    if (app.deleted && app.files) {
-      app.files.forEach(f => {
-        filesByUser[userKey].push({
-          awardName: app.awardName,
-          title: app.title,
-          status: '已删除',
-          fileName: f.name,
-          fileData: f.dataUrl
-        });
-      });
-    }
-  });
-  
-  let totalCount = 0;
-  Object.keys(filesByUser).forEach(userName => {
-    filesByUser[userName].forEach((f, i) => {
-      setTimeout(() => {
-        if (f.fileData) {
-          const a = document.createElement('a');
-          a.href = f.fileData;
-          // 按申报人/奖项/申报标题/状态_文件名 组织
-          a.download = userName + '/' + f.awardName + '/' + f.title + '_' + f.status + '_' + f.fileName;
-          a.click();
-          totalCount++;
-        }
-      }, totalCount * 200);
-      totalCount++;
-    });
-  });
-  
-  setTimeout(() => {
-    showToast('开始下载附件，按申报人分组', 'success');
-  }, 100);
+  showToast('导出成功，共 ' + _allHistoryData.length + ' 条记录', 'success');
 }
 
 // ==================== 时间线管理 ====================
