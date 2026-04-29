@@ -1481,13 +1481,16 @@ async function syncDataFromBackend(showToastMsg = true) {
             awardId: String(a.award_id),
             awardName: a.award_name || '',
             userId: a.user_id,
-            userName: a.username || '',
+            userName: a.username || a.contact_name || '',
             contactName: a.contact_name || '',
+            contact: a.contact_name || '',
             title: a.project_name || '',
             sortOrder: a.sort_order || 0,
             status: a.status || 'pending',
             reviewComment: a.review_comment || '',
+            rejectReason: a.review_comment && a.status === 'rejected' ? a.review_comment : '',
             files: a.attachments ? (typeof a.attachments === 'string' ? JSON.parse(a.attachments) : a.attachments) : [],
+            submitTime: a.created_at || new Date().toISOString(),
             createdAt: a.created_at || new Date().toISOString(),
             deleted: a.deleted === 1,
           }));
@@ -1534,7 +1537,8 @@ async function syncDataFromBackend(showToastMsg = true) {
           file: t.file_name || t.file || '',
           awardId: String(t.award_id || t.awardId || ''),
           type: t.type || 'award',
-          dataUrl: t.file_url ? API_BASE + (t.file_url.startsWith('/') ? '' : '/') + t.file_url : ''
+          // 优先使用base64数据（直接存数据库，跨设备可靠），其次用文件URL
+          dataUrl: t.file_data || (t.file_url ? API_BASE + (t.file_url.startsWith('/') ? '' : '/') + t.file_url : '')
         }));
         localStorage.setItem('templates', JSON.stringify(templates));
         console.log('[syncDataFromBackend] 模板已更新:', templates.length, '条');
@@ -3691,35 +3695,19 @@ function uploadAwardTemplate(event) {
       uploadedAt: new Date().toISOString()
     };
     
-    // 尝试同步到后端
+    // 尝试同步到后端（直接存储base64内容，不依赖文件系统）
     if (_authToken && backendAvailable) {
       try {
-        // 先上传文件获取URL
-        let fileUrl = '';
-        if (file.size < 10 * 1024 * 1024) { // 小于10MB直接上传
-          const formData = new FormData();
-          formData.append('files', file);
-          const uploadRes = await fetch(API_BASE + '/upload', {
-            method: 'POST',
-            headers: { 'Authorization': 'Bearer ' + _authToken },
-            body: formData
-          });
-          const uploadData = await uploadRes.json();
-          if (uploadData.success && uploadData.data?.[0]) {
-            fileUrl = uploadData.data[0].url;
-          }
-        }
-        
-        // 创建模板记录
         await api.post('/templates', {
           name: newTemplate.name,
           description: newTemplate.desc,
           file_name: file.name,
           award_id: awardId,
           type: 'award',
-          file_url: fileUrl || ''
+          file_url: '',
+          file_data: e.target.result  // 存储完整base64内容到数据库
         });
-        console.log('[uploadAwardTemplate] 已同步到后端');
+        console.log('[uploadAwardTemplate] 已同步到后端（含文件数据）');
       } catch(err) {
         console.warn('[uploadAwardTemplate] 后端同步失败:', err.message);
       }
