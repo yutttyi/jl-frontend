@@ -2942,7 +2942,15 @@ function switchAdminPanel(panel) {
   
   // 根据面板类型刷新对应内容
   if (panel === 'awards') renderAdminAwards();
-  if (panel === 'submissions') { updateFilterOptions(); renderSubmissions(); }
+  if (panel === 'submissions') {
+    // 切换到申报记录面板时，强制从后端同步最新数据
+    if (backendAvailable && _authToken) {
+      syncDataFromBackend(false).then(() => renderSubmissions()).catch(() => renderSubmissions());
+    } else {
+      updateFilterOptions();
+      renderSubmissions();
+    }
+  }
   if (panel === 'users') renderUsers();
   if (panel === 'notices') renderNotices();
   if (panel === 'timeline') renderTimelines();
