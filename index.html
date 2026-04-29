@@ -2608,12 +2608,18 @@ async function submitApplication() {
     if (backendAvailable && _authToken) {
       if (editingAppId) {
         // 后端更新
-        await api.put('/applications/' + editingAppId, {
+        console.log('[submitApplication] 编辑模式, PUT /applications/' + editingAppId, {
+          contact_name: n, project_name: t, sort_order: parseInt(sortOrder),
+          attachments_size: JSON.stringify(filesData).length
+        });
+        
+        const putRes = await api.put('/applications/' + editingAppId, {
           contact_name: n,
           project_name: t,
           sort_order: parseInt(sortOrder),
           attachments: JSON.stringify(filesData),
         });
+        console.log('[submitApplication] PUT 响应:', putRes);
         showToast('✅ 申报已更新！', 'success');
       } else {
         // 后端新增
@@ -2628,7 +2634,15 @@ async function submitApplication() {
         showToast('✅ 申报提交成功！', 'success');
       }
       // 重新同步数据
-      await syncDataFromBackend();
+      console.log('[submitApplication] 开始同步数据...');
+      try {
+        await syncDataFromBackend(false);
+        console.log('[submitApplication] 同步完成');
+      } catch (syncErr) {
+        console.error('[submitApplication] 同步失败(申报已更新):', syncErr.message);
+        // 同步失败不阻止用户操作，但给出提示
+        showToast('⚠️ 申报已保存，但数据同步可能延迟，请稍后刷新页面', 'info');
+      }
     } else {
       // 本地模式
       applications = JSON.parse(localStorage.getItem('applications')) || applications;
