@@ -3320,7 +3320,7 @@ function renderSubmissions() {
       <td><input type="checkbox" ${checked} onchange="toggleSubmissionSelection(${a.id})" style="cursor:pointer;"></td>
       <td><div style="font-weight:500;">${a.userName || '-'}</div>${(a.contactName && a.contactName !== a.userName) ? '<div style="font-size:11px;color:#8A8A8A;">接口人：' + a.contactName + '</div>' : ''}</td>
       <td>${a.awardName||''}</td>
-      <td><span style="background:#F0F4FF;color:#2E86AB;font-size:12px;padding:2px 8px;border-radius:6px;font-weight:600;min-width:28px;display:inline-block;text-align:center;">#${a.sortOrder || 0}</span></td>
+      <td><span style="background:#F0F4FF;color:#2E86AB;font-size:12px;padding:2px 8px;border-radius:6px;font-weight:600;min-width:28px;display:inline-block;text-align:center;">${a.sortOrder || 0}</span></td>
       <td>${a.title||''}${editedBadge}</td><td>${a.files?a.files.length:0}个附件</td><td>${formatDateTime(a.submitTime)}</td><td><span class="record-status ${sc[safeSt]}">${sm[safeSt]}</span></td><td class="actions"><button class="action-btn view-btn" onclick="viewApplication(${a.id})">查看</button></td></tr>`;
   }).join('');
   
@@ -3479,7 +3479,7 @@ function viewApplication(id){
     <div class="detail-section"><div class="detail-label">申报人(账号)</div><div class="detail-value">${a.userName || '-'}</div></div>
     <div class="detail-section"><div class="detail-label">接口人(填写)</div><div class="detail-value">${a.contactName || a.contact || '-'}</div></div>
     <div class="detail-section"><div class="detail-label">奖项</div><div class="detail-value">${a.awardName}</div></div>
-    <div class="detail-section"><div class="detail-label">申报排序</div><div class="detail-value"><span style="background:#F0F4FF;color:#2E86AB;font-size:13px;padding:3px 10px;border-radius:8px;font-weight:600;">#${a.sortOrder || 0}</span></div></div>
+    <div class="detail-section"><div class="detail-label">申报排序</div><div class="detail-value"><span style="background:#F0F4FF;color:#2E86AB;font-size:13px;padding:3px 10px;border-radius:8px;font-weight:600;">${a.sortOrder || 0}</span></div></div>
     <div class="detail-section"><div class="detail-label">申报标题</div><div class="detail-value">${a.title}</div></div>
     <div class="detail-section"><div class="detail-label">当前状态</div>
       <div class="detail-value"><span class="record-status ${sc[safeSt]}" style="font-size:14px;font-weight:600;">${sm[safeSt]}</span></div>
