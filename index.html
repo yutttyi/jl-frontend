@@ -3479,6 +3479,7 @@ function viewApplication(id){
     <div class="detail-section"><div class="detail-label">申报人(账号)</div><div class="detail-value">${a.userName || '-'}</div></div>
     <div class="detail-section"><div class="detail-label">接口人(填写)</div><div class="detail-value">${a.contactName || a.contact || '-'}</div></div>
     <div class="detail-section"><div class="detail-label">奖项</div><div class="detail-value">${a.awardName}</div></div>
+    <div class="detail-section"><div class="detail-label">申报排序</div><div class="detail-value"><span style="background:#F0F4FF;color:#2E86AB;font-size:13px;padding:3px 10px;border-radius:8px;font-weight:600;">#${a.sortOrder || 0}</span></div></div>
     <div class="detail-section"><div class="detail-label">申报标题</div><div class="detail-value">${a.title}</div></div>
     <div class="detail-section"><div class="detail-label">当前状态</div>
       <div class="detail-value"><span class="record-status ${sc[safeSt]}" style="font-size:14px;font-weight:600;">${sm[safeSt]}</span></div>
